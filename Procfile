@@ -1,1 +1,1 @@
-web: java -DPORT=$PORT -jar target/starter-snake-java.jar
+web: java -DPORT=$PORT -jar target/manedev79-snake.jar
