@@ -22,4 +22,8 @@ public class Coordinates {
         if (y < other.y) return "down";
         return "";
     }
+
+    public int distanceTo(Coordinates other) {
+        return Math.abs(x - other.x) + Math.abs(y - other.y);
+    }
 }

@@ -33,4 +33,20 @@ class CoordinatesTest {
     void directionRight() {
         assertEquals("right", coordinates.directionTo(new Coordinates(2, 1)));
     }
+
+    @Test
+    void distanceDiagonal() {
+        assertEquals(2, coordinates.distanceTo(new Coordinates(2, 2)));
+    }
+
+    @Test
+    void distanceZero() {
+        assertEquals(0, coordinates.distanceTo(coordinates));
+    }
+
+    @Test
+    void distanceNeighbor() {
+        assertEquals(1, coordinates.distanceTo(new Coordinates(1, 2)));
+        assertEquals(1, coordinates.distanceTo(new Coordinates(0, 1)));
+    }
 }
