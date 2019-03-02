@@ -3,7 +3,7 @@ starter-snake-java
 
 [![Build Status](https://travis-ci.org/battlesnakeio/starter-snake-java.svg?branch=master)](https://travis-ci.org/battlesnakeio/starter-snake-java)
 
-A simple [Battlesnake AI](http://battlesnake.io) written in Java.
+A [Battlesnake AI](http://battlesnake.io) written in Java.
 
 Visit [https://docs.battlesnake.io](https://docs.battlesnake.io) 
 for API documentation and instructions for running your AI.
@@ -44,12 +44,12 @@ Executable Jar
 mvn compile package
 ```
 
-Will result in a jar file in `target` called `starter-snake-java.jar`
+Will result in a jar file in `target` called `manedev79-hungry-snake.jar`
 
 You can then run this file with the command
 
 ```bash
-java -jar target/starter-snake-java.jar
+java -jar target/manedev79-hungry-snake.jar
 ```
 
 
