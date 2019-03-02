@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class AbstractSnake implements SnakeHandler {
     private static final Map<String, String> EMPTY = new HashMap<>();
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
-    private static final Logger LOG = LoggerFactory.getLogger(Snake.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
 
     @Override
     public Map<String, String> ping() {

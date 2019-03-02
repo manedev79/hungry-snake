@@ -50,7 +50,7 @@
                     <arguments>
                         <argument>-classpath</argument>
                         <classpath/>
-                        <argument>io.battlesnake.manedev79.Snake</argument>
+                        <argument>io.battlesnake.manedev79.GameServer</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -83,14 +83,14 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        io.battlesnake.manedev79.Snake
+                                        io.battlesnake.manedev79.GameServer
                                     </mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>manedev79-snake</finalName>
+                            <finalName>manedev79-hungry-snake</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>

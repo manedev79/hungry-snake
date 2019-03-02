@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 import static spark.Spark.*;
 
 /**
- * Snake server that deals with requests from the snake engine.
+ * GameServer server that deals with requests from the snake engine.
  * Just boiler plate code.  See the readme to get started.
  * It follows the spec here: https://github.com/battlesnakeio/docs/tree/master/apis/snake
  */
-public class Snake {
+public class GameServer {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     private static final SnakeHandler HANDLER = new HungrySnake();
-    private static final Logger LOG = LoggerFactory.getLogger(Snake.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
 
     /**
      * Main entry point.
