@@ -5,21 +5,18 @@ import io.battlesnake.manedev79.game.Coordinates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class HungrySnake extends AbstractSnake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
-    private JsonNode moveRequest;
-    private Coordinates myPosition;
     String nextMove = DEFAULT_DIRECTION;
+    private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
+    private SnakeStats ownSnake;
 
     @Override
     protected String moveIntoDirection(final JsonNode moveRequest) {
@@ -32,17 +29,17 @@ public class HungrySnake extends AbstractSnake {
 
     private void getMyPosition() {
         JsonNode snakeHead = moveRequest.get("you").get("body").get(0);
-
-        myPosition = Coordinates.of(snakeHead);
+        int bodyLength = moveRequest.get("you").get("body").size();
+        ownSnake = new SnakeStats(Coordinates.of(snakeHead), bodyLength);
     }
 
     private void moveToFood() {
         Coordinates someFoodLocation = someFoodLocation(moveRequest);
         Collection<String> intendedDirections = new ArrayList<>();
-        if (myPosition.x > someFoodLocation.x) intendedDirections.add("left");
-        if (myPosition.x < someFoodLocation.x) intendedDirections.add("right");
-        if (myPosition.y < someFoodLocation.y) intendedDirections.add("down");
-        if (myPosition.y > someFoodLocation.y) intendedDirections.add("up");
+        if (ownSnake.headPosition.x > someFoodLocation.x) intendedDirections.add("left");
+        if (ownSnake.headPosition.x < someFoodLocation.x) intendedDirections.add("right");
+        if (ownSnake.headPosition.y < someFoodLocation.y) intendedDirections.add("down");
+        if (ownSnake.headPosition.y > someFoodLocation.y) intendedDirections.add("up");
 
         nextMove = intendedDirections.stream()
                 .findFirst()
@@ -83,19 +80,19 @@ public class HungrySnake extends AbstractSnake {
 
     private void avoidSnakeBody(Collection<Coordinates> snakeBody) {
         badDirections.addAll(snakeBody.stream()
-                .filter(it -> myPosition.distanceTo(it) == 1)
-                .map(it -> myPosition.directionTo(it))
+                .filter(it -> ownSnake.headPosition.distanceTo(it) == 1)
+                .map(it -> ownSnake.headPosition.directionTo(it))
                 .collect(Collectors.toSet()));
     }
 
     private void avoidSnakeHeadCollision() {
-        Collection<Coordinates> snakeHeads = new HashSet<>();
+        Collection<SnakeStats> snakeStats = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
-                snake -> snakeHeads.add(Coordinates.of(snake.get("body").get(0)))
-        );
-        HashSet<String> dangerousDirections = snakeHeads.stream()
-                .filter(it -> myPosition.distanceTo(it) == 2)
-                .map(it -> myPosition.directionsTo(it))
+                snake -> snakeStats.add(new SnakeStats(Coordinates.of(snake.get("body").get(0)), snake.get("body").size())));
+        HashSet<String> dangerousDirections = snakeStats.stream()
+                .filter(it -> ownSnake.headPosition.distanceTo(it.headPosition) == 2)
+                .filter(it -> it.length >= ownSnake.length)
+                .map(it -> ownSnake.headPosition.directionsTo(it.headPosition))
                 .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
         this.badDirections.addAll(dangerousDirections);
         this.dangerousDirections.addAll(dangerousDirections);
@@ -104,14 +101,14 @@ public class HungrySnake extends AbstractSnake {
     private void avoidWalls() {
         int maxX = moveRequest.get("board").get("width").asInt() - 1;
         int maxY = moveRequest.get("board").get("height").asInt() - 1;
-        if (myPosition.x <= 0) badDirections.add("left");
-        if (myPosition.y <= 0) badDirections.add("up");
-        if (myPosition.x >= maxX) badDirections.add("right");
-        if (myPosition.y >= maxY) badDirections.add("down");
+        if (ownSnake.headPosition.x <= 0) badDirections.add("left");
+        if (ownSnake.headPosition.y <= 0) badDirections.add("up");
+        if (ownSnake.headPosition.x >= maxX) badDirections.add("right");
+        if (ownSnake.headPosition.y >= maxY) badDirections.add("down");
     }
 
     private void avoidOtherSnakes() {
-        Collection<Coordinates> snakeBodies = new HashSet<>();
+        Collection<Coordinates> snakeBodies = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
                 snake -> snake.get("body").forEach(
                         element -> snakeBodies.add(Coordinates.of(element))
@@ -130,5 +127,16 @@ public class HungrySnake extends AbstractSnake {
                             .orElse(DEFAULT_DIRECTION));
         }
         LOG.debug("Next move: {}", nextMove);
+    }
+
+    private static class SnakeStats {
+        final Coordinates headPosition;
+        final int length;
+
+        SnakeStats(Coordinates headPosition, int length) {
+
+            this.headPosition = headPosition;
+            this.length = length;
+        }
     }
 }

@@ -36,6 +36,22 @@ class HungrySnakeTest {
         assertNotEquals("down", snake.nextMove);
     }
 
+    @Test
+    void avoidCollisionWithOtherSnakes() throws IOException {
+        JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/otherSnakeAhead.json"));
+        snake.moveIntoDirection(moveRequest);
+
+        assertNotEquals("down", snake.nextMove);
+    }
+
+    @Test
+    void killShorterSnake() throws IOException {
+        JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/killShorterSnake.json"));
+        snake.moveIntoDirection(moveRequest);
+
+        assertEquals("left", snake.nextMove);
+    }
+
     private InputStream from(String fileName) {
         return this.getClass().getResourceAsStream(fileName);
     }
