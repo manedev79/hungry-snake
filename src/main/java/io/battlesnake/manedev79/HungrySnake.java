@@ -6,12 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class HungrySnake extends AbstractSnake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
+    private static final Coordinates DEFAULT_LOCATION = new Coordinates(0, 0);
     String nextMove = DEFAULT_DIRECTION;
     private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
@@ -34,12 +40,12 @@ public class HungrySnake extends AbstractSnake {
     }
 
     private void moveToFood() {
-        Coordinates someFoodLocation = someFoodLocation(moveRequest);
+        Coordinates foodLocation = closestFoodLocation(moveRequest);
         Collection<String> intendedDirections = new ArrayList<>();
-        if (ownSnake.headPosition.x > someFoodLocation.x) intendedDirections.add("left");
-        if (ownSnake.headPosition.x < someFoodLocation.x) intendedDirections.add("right");
-        if (ownSnake.headPosition.y < someFoodLocation.y) intendedDirections.add("down");
-        if (ownSnake.headPosition.y > someFoodLocation.y) intendedDirections.add("up");
+        if (ownSnake.headPosition.x > foodLocation.x) intendedDirections.add("left");
+        if (ownSnake.headPosition.x < foodLocation.x) intendedDirections.add("right");
+        if (ownSnake.headPosition.y < foodLocation.y) intendedDirections.add("down");
+        if (ownSnake.headPosition.y > foodLocation.y) intendedDirections.add("up");
 
         nextMove = intendedDirections.stream()
                 .findFirst()
@@ -47,16 +53,19 @@ public class HungrySnake extends AbstractSnake {
         LOG.debug("Next move: {}", nextMove);
     }
 
-    private Coordinates someFoodLocation(JsonNode moveRequest) {
-        JsonNode firstFood = moveRequest.get("board").get("food").get(0);
-        try {
-            int x = firstFood.get("x").asInt();
-            int y = firstFood.get("y").asInt();
+    private Coordinates closestFoodLocation(JsonNode moveRequest) {
+        Collection<Coordinates> foodLocations = new LinkedList<>();
+        moveRequest.get("board").get("food").forEach(food -> foodLocations.add(Coordinates.of(food)));
 
-            return new Coordinates(x, y);
-        } catch (NullPointerException e) {
-            return new Coordinates(0, 0);
-        }
+        return foodLocations.stream()
+                .min(this::compareDistanceToFood)
+                .orElse(DEFAULT_LOCATION);
+    }
+
+    private int compareDistanceToFood(Coordinates firstFood, Coordinates secondFood) {
+        int distanceToFirst = ownSnake.headPosition.distanceTo(firstFood);
+        int distanceToSecond = ownSnake.headPosition.distanceTo(secondFood);
+        return Integer.compare(distanceToFirst, distanceToSecond);
     }
 
     private void avoidCollision() {
@@ -130,13 +139,14 @@ public class HungrySnake extends AbstractSnake {
     }
 
     private static class SnakeStats {
+
         final Coordinates headPosition;
         final int length;
-
         SnakeStats(Coordinates headPosition, int length) {
 
             this.headPosition = headPosition;
             this.length = length;
         }
+
     }
 }
