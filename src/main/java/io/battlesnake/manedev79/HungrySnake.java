@@ -17,7 +17,7 @@ public class HungrySnake extends AbstractSnake {
     private static final String DEFAULT_DIRECTION = "up";
     private JsonNode moveRequest;
     private Coordinates myPosition;
-    private String nextMove = DEFAULT_DIRECTION;
+    String nextMove = DEFAULT_DIRECTION;
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
 
