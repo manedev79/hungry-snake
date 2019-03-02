@@ -6,12 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
+import java.util.function.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class HungrySnake extends AbstractSnake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
@@ -99,12 +95,24 @@ public class HungrySnake extends AbstractSnake {
         moveRequest.get("board").get("snakes").forEach(
                 snake -> snakeStats.add(new SnakeStats(Coordinates.of(snake.get("body").get(0)), snake.get("body").size())));
         HashSet<String> dangerousDirections = snakeStats.stream()
-                .filter(it -> ownSnake.headPosition.distanceTo(it.headPosition) == 2)
-                .filter(it -> it.length >= ownSnake.length)
-                .map(it -> ownSnake.headPosition.directionsTo(it.headPosition))
+                .filter(potentiallyCollidingSnakes())
+                .filter(equalOrLargerSnakes())
+                .map(allPossibleDirections())
                 .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
         this.badDirections.addAll(dangerousDirections);
         this.dangerousDirections.addAll(dangerousDirections);
+    }
+
+    private Function<SnakeStats, Collection<String>> allPossibleDirections() {
+        return it -> ownSnake.headPosition.directionsTo(it.headPosition);
+    }
+
+    private Predicate<SnakeStats> equalOrLargerSnakes() {
+        return it -> it.length >= ownSnake.length;
+    }
+
+    private Predicate<SnakeStats> potentiallyCollidingSnakes() {
+        return it -> ownSnake.headPosition.distanceTo(it.headPosition) == 2;
     }
 
     private void avoidWalls() {
@@ -139,14 +147,12 @@ public class HungrySnake extends AbstractSnake {
     }
 
     private static class SnakeStats {
-
         final Coordinates headPosition;
         final int length;
-        SnakeStats(Coordinates headPosition, int length) {
 
+        SnakeStats(Coordinates headPosition, int length) {
             this.headPosition = headPosition;
             this.length = length;
         }
-
     }
 }
