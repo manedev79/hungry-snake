@@ -1,7 +1,5 @@
-starter-snake-java
+hungry-snake
 ===
-
-[![Build Status](https://travis-ci.org/battlesnakeio/starter-snake-java.svg?branch=master)](https://travis-ci.org/battlesnakeio/starter-snake-java)
 
 A [Battlesnake AI](http://battlesnake.io) written in Java.
 
