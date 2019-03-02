@@ -61,11 +61,11 @@ public abstract class AbstractSnake implements SnakeHandler {
     @Override
     public Map<String, String> move(JsonNode moveRequest) {
         Map<String, String> response = new HashMap<>();
-        response.put("move", moveIntoDirection(moveRequest));
+        response.put("move", determineNextMove(moveRequest));
         return response;
     }
 
-    protected abstract String moveIntoDirection(JsonNode moveRequest);
+    protected abstract String determineNextMove(JsonNode moveRequest);
 
     @Override
     public Map<String, String> end(JsonNode endRequest) {

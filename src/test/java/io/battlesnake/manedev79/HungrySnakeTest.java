@@ -23,7 +23,7 @@ class HungrySnakeTest {
     @Test
     void moveToFood() throws IOException {
         JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/moveToFood.json"));
-        snake.moveIntoDirection(moveRequest);
+        snake.determineNextMove(moveRequest);
 
         assertEquals("down", snake.nextMove);
     }
@@ -31,7 +31,7 @@ class HungrySnakeTest {
     @Test
     void doNotReverseIntoOwnBody() throws IOException {
         JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/foodRightBehind.json"));
-        snake.moveIntoDirection(moveRequest);
+        snake.determineNextMove(moveRequest);
 
         assertNotEquals("down", snake.nextMove);
     }
@@ -39,7 +39,7 @@ class HungrySnakeTest {
     @Test
     void avoidCollisionWithOtherSnakes() throws IOException {
         JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/otherSnakeAhead.json"));
-        snake.moveIntoDirection(moveRequest);
+        snake.determineNextMove(moveRequest);
 
         assertNotEquals("down", snake.nextMove);
     }
@@ -47,7 +47,7 @@ class HungrySnakeTest {
     @Test
     void killShorterSnake() throws IOException {
         JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/killShorterSnake.json"));
-        snake.moveIntoDirection(moveRequest);
+        snake.determineNextMove(moveRequest);
 
         assertEquals("left", snake.nextMove);
     }

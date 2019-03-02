@@ -25,7 +25,7 @@ public class HungrySnake extends AbstractSnake {
     private SnakeStats ownSnake;
 
     @Override
-    protected String moveIntoDirection(final JsonNode moveRequest) {
+    protected String determineNextMove(final JsonNode moveRequest) {
         this.moveRequest = moveRequest;
         getMyPosition();
         moveToFood();
