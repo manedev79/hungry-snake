@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.battlesnake</groupId>
     <artifactId>hungry-snake</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>hungry-snake</name>
     <description>Hungry battlesnake eating food and snake heads</description>
 
@@ -90,7 +90,7 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName></finalName>
+                            <finalName>manedev79-hungry-snake</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
