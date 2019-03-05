@@ -6,20 +6,20 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class Coordinates {
+public class Field {
     public final int x;
     public final int y;
 
-    public Coordinates(int x, int y) {
+    public Field(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public static Coordinates of(JsonNode jsonCoordinates) {
-        return new Coordinates(jsonCoordinates.get("x").asInt(), jsonCoordinates.get("y").asInt());
+    public static Field of(JsonNode jsonCoordinates) {
+        return new Field(jsonCoordinates.get("x").asInt(), jsonCoordinates.get("y").asInt());
     }
 
-    public String directionTo(Coordinates other) {
+    public String directionTo(Field other) {
         if (x < other.x) return "right";
         if (x > other.x) return "left";
         if (y > other.y) return "up";
@@ -27,7 +27,7 @@ public class Coordinates {
         return "";
     }
 
-    public Collection<String> directionsTo(Coordinates other) {
+    public Collection<String> directionsTo(Field other) {
         Collection<String> directions = new HashSet<>();
         if (x < other.x) directions.add("right");
         if (x > other.x) directions.add("left");
@@ -36,7 +36,7 @@ public class Coordinates {
         return directions;
     }
 
-    public int distanceTo(Coordinates other) {
+    public int distanceTo(Field other) {
         return Math.abs(x - other.x) + Math.abs(y - other.y);
     }
 
@@ -44,7 +44,7 @@ public class Coordinates {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Coordinates that = (Coordinates) o;
+        Field that = (Field) o;
         return x == that.x &&
                 y == that.y;
     }
@@ -56,7 +56,7 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        return "Coordinates{" +
+        return "Field{" +
                 "x=" + x +
                 ", y=" + y +
                 '}';

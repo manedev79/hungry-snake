@@ -2,7 +2,7 @@ package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.battlesnake.manedev79.game.Board;
-import io.battlesnake.manedev79.game.Coordinates;
+import io.battlesnake.manedev79.game.Field;
 import io.battlesnake.manedev79.game.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ public class HungrySnake extends AbstractSnake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
-    private static final Coordinates DEFAULT_LOCATION = new Coordinates(0, 0);
+    private static final Field DEFAULT_LOCATION = new Field(0, 0);
     String nextMove = DEFAULT_DIRECTION;
     private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
@@ -36,26 +36,26 @@ public class HungrySnake extends AbstractSnake {
     private void getMyPosition() {
         JsonNode snakeHead = moveRequest.get("you").get("body").get(0);
         int bodyLength = moveRequest.get("you").get("body").size();
-        ownSnake = new SnakeStats(Coordinates.of(snakeHead), bodyLength);
+        ownSnake = new SnakeStats(Field.of(snakeHead), bodyLength);
     }
 
     private void moveToFoodByPath() {
-        Coordinates foodLocation = closestFoodLocation(moveRequest);
+        Field foodLocation = closestFoodLocation(moveRequest);
         Path path = board.getPath(ownSnake.headPosition, foodLocation);
-        Coordinates nextField = path.getSteps().stream().findFirst().orElse(DEFAULT_LOCATION);
+        Field nextField = path.getSteps().stream().findFirst().orElse(DEFAULT_LOCATION);
         nextMove = ownSnake.headPosition.directionTo(nextField);
     }
 
-    private Coordinates closestFoodLocation(JsonNode moveRequest) {
-        Collection<Coordinates> foodLocations = new LinkedList<>();
-        moveRequest.get("board").get("food").forEach(food -> foodLocations.add(Coordinates.of(food)));
+    private Field closestFoodLocation(JsonNode moveRequest) {
+        Collection<Field> foodLocations = new LinkedList<>();
+        moveRequest.get("board").get("food").forEach(food -> foodLocations.add(Field.of(food)));
 
         return foodLocations.stream()
                 .min(this::compareDistanceToFood)
                 .orElse(DEFAULT_LOCATION);
     }
 
-    private int compareDistanceToFood(Coordinates firstFood, Coordinates secondFood) {
+    private int compareDistanceToFood(Field firstFood, Field secondFood) {
         int distanceToFirst = ownSnake.headPosition.distanceTo(firstFood);
         int distanceToSecond = ownSnake.headPosition.distanceTo(secondFood);
         return Integer.compare(distanceToFirst, distanceToSecond);
@@ -73,14 +73,14 @@ public class HungrySnake extends AbstractSnake {
     }
 
     private void avoidSelf() {
-        Collection<Coordinates> snakeBody = new HashSet<>();
+        Collection<Field> snakeBody = new HashSet<>();
         for (JsonNode jsonNode : moveRequest.get("you").get("body")) {
-            snakeBody.add(Coordinates.of(jsonNode));
+            snakeBody.add(Field.of(jsonNode));
         }
         avoidSnakeBody(snakeBody);
     }
 
-    private void avoidSnakeBody(Collection<Coordinates> snakeBody) {
+    private void avoidSnakeBody(Collection<Field> snakeBody) {
         badDirections.addAll(snakeBody.stream()
                 .filter(it -> ownSnake.headPosition.distanceTo(it) == 1)
                 .map(it -> ownSnake.headPosition.directionTo(it))
@@ -90,7 +90,7 @@ public class HungrySnake extends AbstractSnake {
     private void avoidSnakeHeadCollision() {
         Collection<SnakeStats> snakeStats = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
-                snake -> snakeStats.add(new SnakeStats(Coordinates.of(snake.get("body").get(0)), snake.get("body").size())));
+                snake -> snakeStats.add(new SnakeStats(Field.of(snake.get("body").get(0)), snake.get("body").size())));
         HashSet<String> dangerousDirections = snakeStats.stream()
                 .filter(potentiallyCollidingSnakes())
                 .filter(equalOrLargerSnakes())
@@ -122,10 +122,10 @@ public class HungrySnake extends AbstractSnake {
     }
 
     private void avoidOtherSnakes() {
-        Collection<Coordinates> snakeBodies = new LinkedList<>();
+        Collection<Field> snakeBodies = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
                 snake -> snake.get("body").forEach(
-                        element -> snakeBodies.add(Coordinates.of(element))
+                        element -> snakeBodies.add(Field.of(element))
                 )
         );
         avoidSnakeBody(snakeBodies);
@@ -144,10 +144,10 @@ public class HungrySnake extends AbstractSnake {
     }
 
     private static class SnakeStats {
-        final Coordinates headPosition;
+        final Field headPosition;
         final int length;
 
-        SnakeStats(Coordinates headPosition, int length) {
+        SnakeStats(Field headPosition, int length) {
             this.headPosition = headPosition;
             this.length = length;
         }
