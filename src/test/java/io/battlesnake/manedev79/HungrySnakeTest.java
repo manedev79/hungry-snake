@@ -2,6 +2,7 @@ package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,38 +22,35 @@ class HungrySnakeTest {
     }
 
     @Test
-    void moveToFood() throws IOException {
-        JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/moveToFood.json"));
+    void moveToFood() {
+        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/moveToFood.json");
         snake.determineNextMove(moveRequest);
 
         assertEquals("down", snake.nextMove);
     }
 
     @Test
-    void doNotReverseIntoOwnBody() throws IOException {
-        JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/foodRightBehind.json"));
+    void doNotReverseIntoOwnBody() {
+        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/foodRightBehind.json");
         snake.determineNextMove(moveRequest);
 
         assertNotEquals("down", snake.nextMove);
     }
 
     @Test
-    void avoidCollisionWithOtherSnakes() throws IOException {
-        JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/otherSnakeAhead.json"));
+    void avoidCollisionWithOtherSnakes() {
+        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/otherSnakeAhead.json");
         snake.determineNextMove(moveRequest);
 
         assertNotEquals("down", snake.nextMove);
     }
 
     @Test
-    void killShorterSnake() throws IOException {
-        JsonNode moveRequest = mapper.readTree(from("/hungry-snake-test/killShorterSnake.json"));
+    void killShorterSnake() {
+        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/killShorterSnake.json");
         snake.determineNextMove(moveRequest);
 
         assertEquals("left", snake.nextMove);
     }
 
-    private InputStream from(String fileName) {
-        return this.getClass().getResourceAsStream(fileName);
-    }
 }

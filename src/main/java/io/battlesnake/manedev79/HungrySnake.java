@@ -1,7 +1,9 @@
 package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.battlesnake.manedev79.game.Board;
 import io.battlesnake.manedev79.game.Coordinates;
+import io.battlesnake.manedev79.game.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +21,14 @@ public class HungrySnake extends AbstractSnake {
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
     private SnakeStats ownSnake;
+    private Board board;
 
     @Override
     protected String determineNextMove(final JsonNode moveRequest) {
         this.moveRequest = moveRequest;
+        this.board = Board.of(moveRequest);
         getMyPosition();
-        moveToFood();
+        moveToFoodByPath();
         avoidCollision();
         return nextMove;
     }
@@ -35,18 +39,11 @@ public class HungrySnake extends AbstractSnake {
         ownSnake = new SnakeStats(Coordinates.of(snakeHead), bodyLength);
     }
 
-    private void moveToFood() {
+    private void moveToFoodByPath() {
         Coordinates foodLocation = closestFoodLocation(moveRequest);
-        Collection<String> intendedDirections = new ArrayList<>();
-        if (ownSnake.headPosition.x > foodLocation.x) intendedDirections.add("left");
-        if (ownSnake.headPosition.x < foodLocation.x) intendedDirections.add("right");
-        if (ownSnake.headPosition.y < foodLocation.y) intendedDirections.add("down");
-        if (ownSnake.headPosition.y > foodLocation.y) intendedDirections.add("up");
-
-        nextMove = intendedDirections.stream()
-                .findFirst()
-                .orElse(DEFAULT_DIRECTION);
-        LOG.debug("Next move: {}", nextMove);
+        Path path = board.getPath(ownSnake.headPosition, foodLocation);
+        Coordinates nextField = path.getSteps().stream().findFirst().orElse(DEFAULT_LOCATION);
+        nextMove = ownSnake.headPosition.directionTo(nextField);
     }
 
     private Coordinates closestFoodLocation(JsonNode moveRequest) {
