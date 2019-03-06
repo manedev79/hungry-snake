@@ -51,13 +51,13 @@ public class Board {
     }
 
     private Collection<Field> aStarWay(Field start, Field destination) {
-        LOG.info("A* way from {} to {}", start, destination);
+        LOG.debug("A* way from {} to {}", start, destination);
         openSet.add(start);
         gScore.put(start, 0);
         fScore.put(start, start.distanceTo(destination));
 
         while (!openSet.isEmpty()) {
-            LOG.info("OpenSet head:{}, all {}", openSet.peek(), openSet);
+            LOG.debug("OpenSet head:{}, all {}", openSet.peek(), openSet);
             Field current = openSet.remove();
             if (current.equals(destination)) {
                 return reconstructPath(cameFrom, current);
@@ -118,7 +118,7 @@ public class Board {
         // Remove current field
         path.remove(0);
 
-        LOG.info("Reconstructed path: {}", path);
+        LOG.debug("Reconstructed path: {}", path);
         return path;
     }
 
