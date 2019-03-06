@@ -53,4 +53,11 @@ class HungrySnakeTest {
         assertEquals("left", snake.nextMove);
     }
 
+    @Test
+    void avoidWallCrash() {
+        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/avoidWallCrash.json");
+        snake.determineNextMove(moveRequest);
+
+        assertEquals("right", snake.nextMove);
+    }
 }

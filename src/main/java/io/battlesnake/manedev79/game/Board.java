@@ -29,6 +29,10 @@ public class Board {
         this.blockedFields = allSnakeBodies();
     }
 
+    public Field middleField() {
+        return new Field(maxX / 2, maxY / 2);
+    }
+
     private Collection<Field> allSnakeBodies() {
         Collection<Field> allSnakeBodies = new HashSet<>();
 

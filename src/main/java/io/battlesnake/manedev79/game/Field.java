@@ -10,7 +10,7 @@ public class Field {
     public final int x;
     public final int y;
 
-    public Field(int x, int y) {
+    Field(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -24,7 +24,7 @@ public class Field {
         if (x > other.x) return "left";
         if (y > other.y) return "up";
         if (y < other.y) return "down";
-        return "";
+        return "up"; // Default direction
     }
 
     public Collection<String> directionsTo(Field other) {

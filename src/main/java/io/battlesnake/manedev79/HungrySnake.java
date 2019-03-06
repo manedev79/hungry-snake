@@ -15,7 +15,6 @@ public class HungrySnake implements Snake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
-    private static final Field DEFAULT_LOCATION = new Field(0, 0);
     String nextMove = DEFAULT_DIRECTION;
     private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
@@ -51,7 +50,7 @@ public class HungrySnake implements Snake {
     private void moveToFoodByPath() {
         Field foodLocation = closestFoodLocation(moveRequest);
         Path path = board.getPath(ownSnake.headPosition, foodLocation);
-        Field nextField = path.getSteps().stream().findFirst().orElse(DEFAULT_LOCATION);
+        Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
         nextMove = ownSnake.headPosition.directionTo(nextField);
     }
 
@@ -60,8 +59,8 @@ public class HungrySnake implements Snake {
         moveRequest.get("board").get("food").forEach(food -> foodLocations.add(Field.of(food)));
 
         return foodLocations.stream()
-                .min(this::compareDistanceToFood)
-                .orElse(DEFAULT_LOCATION);
+                            .min(this::compareDistanceToFood)
+                            .orElse(board.middleField());
     }
 
     private int compareDistanceToFood(Field firstFood, Field secondFood) {
@@ -91,9 +90,9 @@ public class HungrySnake implements Snake {
 
     private void avoidSnakeBody(Collection<Field> snakeBody) {
         badDirections.addAll(snakeBody.stream()
-                .filter(it -> ownSnake.headPosition.distanceTo(it) == 1)
-                .map(it -> ownSnake.headPosition.directionTo(it))
-                .collect(Collectors.toSet()));
+                                      .filter(it -> ownSnake.headPosition.distanceTo(it) == 1)
+                                      .map(it -> ownSnake.headPosition.directionTo(it))
+                                      .collect(Collectors.toSet()));
     }
 
     private void avoidSnakeHeadCollision() {
@@ -101,10 +100,10 @@ public class HungrySnake implements Snake {
         moveRequest.get("board").get("snakes").forEach(
                 snake -> snakeStats.add(new SnakeStats(Field.of(snake.get("body").get(0)), snake.get("body").size())));
         HashSet<String> dangerousDirections = snakeStats.stream()
-                .filter(potentiallyCollidingSnakes())
-                .filter(equalOrLargerSnakes())
-                .map(allPossibleDirections())
-                .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+                                                        .filter(potentiallyCollidingSnakes())
+                                                        .filter(equalOrLargerSnakes())
+                                                        .map(allPossibleDirections())
+                                                        .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
         this.badDirections.addAll(dangerousDirections);
         this.dangerousDirections.addAll(dangerousDirections);
     }
@@ -143,11 +142,11 @@ public class HungrySnake implements Snake {
     private void moveSafely() {
         if (badDirections.contains(nextMove)) {
             nextMove = ALL_DIRECTIONS.stream()
-                    .filter(i -> !badDirections.contains(i))
-                    .findFirst()
-                    .orElse(dangerousDirections.stream()
-                            .findFirst()
-                            .orElse(DEFAULT_DIRECTION));
+                                     .filter(i -> !badDirections.contains(i))
+                                     .findFirst()
+                                     .orElse(dangerousDirections.stream()
+                                                                .findFirst()
+                                                                .orElse(DEFAULT_DIRECTION));
         }
         LOG.debug("Next move: {}", nextMove);
     }
