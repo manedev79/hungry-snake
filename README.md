@@ -1,6 +1,8 @@
 hungry-snake
 ===
 
+![](https://api.travis-ci.com/manedev79/hungry-snake.svg?branch=master)
+
 A [Battlesnake AI](http://battlesnake.io) written in Java.
 
 Visit [https://docs.battlesnake.io](https://docs.battlesnake.io) 
