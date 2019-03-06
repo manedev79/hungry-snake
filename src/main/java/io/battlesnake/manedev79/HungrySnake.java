@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
-public class HungrySnake extends AbstractSnake {
+public class HungrySnake implements Snake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
@@ -24,7 +24,16 @@ public class HungrySnake extends AbstractSnake {
     private Board board;
 
     @Override
-    protected String determineNextMove(final JsonNode moveRequest) {
+    public Map<String, String> getSnakeConfig() {
+        Map<String, String> snakeConfig = new HashMap<>();
+        snakeConfig.put("headType", "silly");
+        snakeConfig.put("tailType", "fat-rattle");
+        snakeConfig.put("color", "#ff00ff");
+        return snakeConfig;
+    }
+
+    @Override
+    public String determineNextMove(final JsonNode moveRequest) {
         this.moveRequest = moveRequest;
         this.board = Board.of(moveRequest);
         getMyPosition();

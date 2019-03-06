@@ -13,7 +13,7 @@ import static spark.Spark.*;
  */
 public class GameServer {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
-    private static final SnakeHandler HANDLER = new HungrySnake();
+    private static final SnakeHandler HANDLER = new SnakeHandler();
     private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
 
     /**
