@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BoardTest {
 
@@ -16,18 +16,6 @@ class BoardTest {
     @BeforeEach
     void setUp() {
         board = Board.of(JsonNodes.fromFile("/board-test/emptyBoard.json"));
-    }
-
-    @Test
-    void straightPath() {
-        assertIterableEquals(asList(new Field(2, 3), new Field(3, 3)),
-                board.getPath(new Field(1, 3), new Field(3, 3)).getSteps());
-    }
-
-    @Test
-    void shortestPathAroundObstacle() {
-        board = Board.of(JsonNodes.fromFile("/board-test/boardWithObstacle.json"));
-        assertEquals(8, board.getPath(new Field(4, 2), new Field(0, 2)).getSteps().size());
     }
 
     @Test

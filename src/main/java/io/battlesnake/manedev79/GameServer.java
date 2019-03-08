@@ -44,8 +44,14 @@ public class GameServer {
         post("/end", HANDLER::process, JSON_MAPPER::writeValueAsString);
     }
 
-    private static JsonNode start(Request req, Response res) {
-        LOG.debug(req.toString());
+    /**
+     * /start is called by the engine when a game is first run.
+     *
+     * @param startRequest a map containing the JSON sent to this snake. See the spec for details of what this contains.
+     * @return a response back to the engine containing the snake setup values.
+     */
+    private static JsonNode start(Request startRequest, Response res) {
+        LOG.debug(startRequest.toString());
 
         try {
             return JSON_MAPPER.readTree(GameServer.class.getResourceAsStream("/snakeConfig.json"));

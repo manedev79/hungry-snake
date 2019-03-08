@@ -39,9 +39,6 @@ class SnakeHandler {
             LOG.info("{} called with: {}", uri, req.body());
             Map<String, String> snakeResponse;
             switch (uri) {
-                case "/start":
-                    snakeResponse = start(parsedRequest);
-                    break;
                 case "/ping":
                     snakeResponse = ping();
                     break;
@@ -60,16 +57,6 @@ class SnakeHandler {
             LOG.warn("Something went wrong!", e);
             return null;
         }
-    }
-
-    /**
-     * /start is called by the engine when a game is first run.
-     *
-     * @param startRequest a map containing the JSON sent to this snake. See the spec for details of what this contains.
-     * @return a response back to the engine containing the snake setup values.
-     */
-    private Map<String, String> start(JsonNode startRequest) {
-        return getSnake().getSnakeConfig();
     }
 
     /**

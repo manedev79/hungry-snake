@@ -4,11 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.battlesnake.manedev79.game.Board;
 import io.battlesnake.manedev79.game.Field;
 import io.battlesnake.manedev79.game.Path;
+import io.battlesnake.manedev79.game.Pathfinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class HungrySnake implements Snake {
@@ -21,15 +26,6 @@ public class HungrySnake implements Snake {
     private Collection<String> dangerousDirections = new HashSet<>();
     private SnakeStats ownSnake;
     private Board board;
-
-    @Override
-    public Map<String, String> getSnakeConfig() {
-        Map<String, String> snakeConfig = new HashMap<>();
-        snakeConfig.put("headType", "silly");
-        snakeConfig.put("tailType", "fat-rattle");
-        snakeConfig.put("color", "#ff00ff");
-        return snakeConfig;
-    }
 
     @Override
     public String determineNextMove(final JsonNode moveRequest) {
@@ -49,7 +45,7 @@ public class HungrySnake implements Snake {
 
     private void moveToFoodByPath() {
         Field foodLocation = closestFoodLocation(moveRequest);
-        Path path = board.getPath(ownSnake.headPosition, foodLocation);
+        Path path = new Pathfinder().findPath(board, ownSnake.headPosition, foodLocation);
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
         nextMove = ownSnake.headPosition.directionTo(nextField);
     }
