@@ -1,19 +1,16 @@
 package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static java.time.Duration.ofMillis;
+import static org.junit.jupiter.api.Assertions.*;
 
 class HungrySnakeTest {
-    private ObjectMapper mapper = new ObjectMapper();
+    private static final long REQUEST_TIMEOUT = 250L;
+
     private HungrySnake snake;
 
     @BeforeEach
@@ -23,41 +20,65 @@ class HungrySnakeTest {
 
     @Test
     void moveToFood() {
-        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/moveToFood.json");
-        snake.determineNextMove(moveRequest);
+        JsonNode board = givenBoard("/hungry-snake-test/moveToFood.json");
+
+        determineMovement(board);
 
         assertEquals("down", snake.nextMove);
     }
 
     @Test
     void doNotReverseIntoOwnBody() {
-        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/foodRightBehind.json");
-        snake.determineNextMove(moveRequest);
+        JsonNode board = givenBoard("/hungry-snake-test/foodRightBehind.json");
+
+        determineMovement(board);
 
         assertNotEquals("down", snake.nextMove);
     }
 
     @Test
     void avoidCollisionWithOtherSnakes() {
-        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/otherSnakeAhead.json");
-        snake.determineNextMove(moveRequest);
+        JsonNode board = givenBoard("/hungry-snake-test/otherSnakeAhead.json");
+
+        determineMovement(board);
 
         assertNotEquals("down", snake.nextMove);
     }
 
     @Test
     void killShorterSnake() {
-        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/killShorterSnake.json");
-        snake.determineNextMove(moveRequest);
+        JsonNode board = givenBoard("/hungry-snake-test/killShorterSnake.json");
+
+        determineMovement(board);
 
         assertEquals("left", snake.nextMove);
     }
 
     @Test
     void avoidWallCrash() {
-        JsonNode moveRequest = JsonNodes.fromFile("/hungry-snake-test/avoidWallCrash.json");
-        snake.determineNextMove(moveRequest);
+        JsonNode board = givenBoard("/hungry-snake-test/avoidWallCrash.json");
+
+        determineMovement(board);
 
         assertEquals("right", snake.nextMove);
+    }
+
+    @Test
+    void noPathToFood() {
+        JsonNode board = givenBoard("/hungry-snake-test/noPathToFood.json");
+
+        determineMovement(board);
+
+        assertEquals("down", snake.nextMove);
+    }
+
+    private JsonNode givenBoard(String fileName) {
+        return JsonNodes.fromFile(fileName);
+    }
+
+    private void determineMovement(JsonNode moveRequest) {
+        assertTimeout(ofMillis(REQUEST_TIMEOUT), () -> {
+            snake.determineNextMove(moveRequest);
+        });
     }
 }
