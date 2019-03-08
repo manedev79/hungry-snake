@@ -1,8 +1,14 @@
 package io.battlesnake.manedev79;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Request;
+import spark.Response;
+
+import java.io.IOException;
 
 import static spark.Spark.*;
 
@@ -32,10 +38,21 @@ public class GameServer {
         port(Integer.parseInt(port));
         get("/", (req, res) -> "Battlesnake documentation can be found at " +
                 "<a href=\"https://docs.battlesnake.io\">https://docs.battlesnake.io</a>.");
-        post("/start", HANDLER::process, JSON_MAPPER::writeValueAsString);
+        post("/start", GameServer::start, JSON_MAPPER::writeValueAsString);
         post("/ping", HANDLER::process, JSON_MAPPER::writeValueAsString);
         post("/move", HANDLER::process, JSON_MAPPER::writeValueAsString);
         post("/end", HANDLER::process, JSON_MAPPER::writeValueAsString);
+    }
+
+    private static JsonNode start(Request req, Response res) {
+        LOG.debug(req.toString());
+
+        try {
+            return JSON_MAPPER.readTree(GameServer.class.getResourceAsStream("/snakeConfig.json"));
+        } catch (IOException e) {
+            LOG.error("Cannot read snake config", e);
+            return NullNode.getInstance();
+        }
     }
 
 }
