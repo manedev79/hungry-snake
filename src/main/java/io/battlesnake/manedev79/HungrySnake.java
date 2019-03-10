@@ -20,6 +20,7 @@ public class HungrySnake implements Snake {
     private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
+    private static final int HUNGRY_THRESHOULD = 50;
     String nextMove = DEFAULT_DIRECTION;
     private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
@@ -37,7 +38,9 @@ public class HungrySnake implements Snake {
         this.moveRequest = moveRequest;
         this.board = Board.of(moveRequest);
         getMyPosition();
-        moveToFood();
+        if (ownSnake.health < HUNGRY_THRESHOULD) {
+            moveToFood();
+        }
         avoidCollision();
         return nextMove;
     }
