@@ -10,8 +10,6 @@ for API documentation and instructions for running your AI.
 
 This snake is built using a lightweight http server Spark framework - [http://sparkjava.com/documentation](http://sparkjava.com/documentation)
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
 Requirements
 ---
 
