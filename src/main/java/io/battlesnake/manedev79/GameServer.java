@@ -32,8 +32,8 @@ public class GameServer {
         if (port != null) {
             LOG.info("Found system provided port: {}", port);
         } else {
-            LOG.info("Using default port: {}", port);
             port = "8080";
+            LOG.info("Using default port: {}", port);
         }
         port(Integer.parseInt(port));
         get("/", (req, res) -> "Battlesnake documentation can be found at " +
