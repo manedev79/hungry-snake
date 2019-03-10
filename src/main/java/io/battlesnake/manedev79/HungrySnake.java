@@ -32,7 +32,7 @@ public class HungrySnake implements Snake {
         this.moveRequest = moveRequest;
         this.board = Board.of(moveRequest);
         getMyPosition();
-        moveToFoodByPath();
+        moveToFood();
         avoidCollision();
         return nextMove;
     }
@@ -43,7 +43,7 @@ public class HungrySnake implements Snake {
         ownSnake = new SnakeStats(Field.of(snakeHead), bodyLength);
     }
 
-    private void moveToFoodByPath() {
+    private void moveToFood() {
         Field foodLocation = closestFoodLocation(moveRequest);
         Path path = new Pathfinder().findPath(board, ownSnake.headPosition, foodLocation);
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
