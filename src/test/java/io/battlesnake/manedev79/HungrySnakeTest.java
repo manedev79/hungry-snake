@@ -1,9 +1,13 @@
 package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.battlesnake.manedev79.game.Pathfinder;
 import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,11 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class HungrySnakeTest {
     private static final long REQUEST_TIMEOUT = 250L;
 
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private Pathfinder pathfinder = new Pathfinder(executorService);
     private HungrySnake snake;
 
     @BeforeEach
     void setUp() {
-        snake = new HungrySnake();
+        snake = new HungrySnake(pathfinder);
     }
 
     @Test

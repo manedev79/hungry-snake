@@ -6,8 +6,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.EMPTY_SET;
 
 public class Path {
+    @SuppressWarnings("unchecked")
+    public static final Path NO_PATH = new Path(EMPTY_SET);
+
     private List<Field> steps = new ArrayList<>();
 
     private Path(Collection<Field> coordinates) {

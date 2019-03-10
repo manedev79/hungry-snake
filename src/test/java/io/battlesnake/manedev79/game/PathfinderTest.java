@@ -4,6 +4,8 @@ import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.Executors;
+
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -14,7 +16,7 @@ class PathfinderTest {
 
     @BeforeEach
     void setUp() {
-        pathfinder = new Pathfinder();
+        pathfinder = new Pathfinder(Executors.newSingleThreadExecutor());
     }
 
     @Test

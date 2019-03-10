@@ -2,6 +2,7 @@ package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.battlesnake.manedev79.game.Pathfinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -9,11 +10,14 @@ import spark.Response;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class SnakeHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
     private static final Map<String, String> EMPTY = new HashMap<>();
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
-    private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     /**
      * /ping is called by the play application during the tournament or on play.battlesnake.io to make sure your
@@ -83,6 +87,6 @@ class SnakeHandler {
     }
 
     private Snake getSnake() {
-        return new HungrySnake();
+        return new HungrySnake(new Pathfinder(executorService));
     }
 }

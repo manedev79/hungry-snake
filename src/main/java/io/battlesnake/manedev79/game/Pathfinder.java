@@ -4,11 +4,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeoutException;
 
+import static io.battlesnake.manedev79.game.Path.NO_PATH;
 import static java.lang.Integer.signum;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class Pathfinder {
+    private static final boolean INTERRUPT_IF_RUNNING = true;
+    private static final int PATHFINDER_TIMEOUT_MILLIS = 200;
     private static final Logger LOG = LoggerFactory.getLogger(Pathfinder.class);
+    private final ExecutorService executorService;
 
     private PriorityQueue<Field> openSet = new PriorityQueue<>(this::compareFScore);
     private Set<Field> closedSet = new HashSet<>();
@@ -17,9 +26,24 @@ public class Pathfinder {
     private Map<Field, Integer> fScore = new HashMap<>();
     private Board board;
 
+    public Pathfinder(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
     public Path findPath(Board board, Field start, Field destination) {
         this.board = board;
-        return Path.of(aStarWay(start, destination));
+        Path path = NO_PATH;
+        FutureTask<Path> pathToFood = new FutureTask<>(() -> Path.of(aStarWay(start, destination)));
+        executorService.submit(pathToFood);
+
+        try {
+            path = pathToFood.get(PATHFINDER_TIMEOUT_MILLIS, MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            LOG.warn("Unable to calculate path to food!", e);
+            pathToFood.cancel(INTERRUPT_IF_RUNNING);
+        }
+
+        return path;
     }
 
     private Collection<Field> aStarWay(Field start, Field destination) {

@@ -26,6 +26,11 @@ public class HungrySnake implements Snake {
     private Collection<String> dangerousDirections = new HashSet<>();
     private SnakeStats ownSnake;
     private Board board;
+    private Pathfinder pathfinder;
+
+    public HungrySnake(Pathfinder pathfinder) {
+        this.pathfinder = pathfinder;
+    }
 
     @Override
     public String determineNextMove(final JsonNode moveRequest) {
@@ -45,7 +50,7 @@ public class HungrySnake implements Snake {
 
     private void moveToFood() {
         Field foodLocation = closestFoodLocation(moveRequest);
-        Path path = new Pathfinder().findPath(board, ownSnake.headPosition, foodLocation);
+        Path path = pathfinder.findPath(board, ownSnake.headPosition, foodLocation);
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
         nextMove = ownSnake.headPosition.directionTo(nextField);
     }
