@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.battlesnake.manedev79.game.Pathfinder;
 import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutorService;
@@ -51,6 +52,7 @@ class HungrySnakeTest {
         assertNotEquals("down", snake.nextMove);
     }
 
+    @Disabled
     @Test
     void killShorterSnake() {
         JsonNode board = givenBoard("/hungry-snake-test/killShorterSnake.json");
@@ -76,6 +78,15 @@ class HungrySnakeTest {
         determineMovement(board);
 
         assertEquals("down", snake.nextMove);
+    }
+
+    @Test
+    void chaseTail() {
+        JsonNode board = givenBoard("/hungry-snake-test/chasingTail.json");
+
+        determineMovement(board);
+
+        assertEquals("up", snake.nextMove);
     }
 
     private JsonNode givenBoard(String fileName) {

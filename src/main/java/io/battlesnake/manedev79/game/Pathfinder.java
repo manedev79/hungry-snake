@@ -39,7 +39,7 @@ public class Pathfinder {
         try {
             path = pathToFood.get(PATHFINDER_TIMEOUT_MILLIS, MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOG.warn("Unable to calculate path to food!", e);
+            LOG.warn("Unable to calculate path to {}!", destination);
             pathToFood.cancel(INTERRUPT_IF_RUNNING);
         }
 

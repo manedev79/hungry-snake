@@ -8,10 +8,7 @@ import io.battlesnake.manedev79.game.Pathfinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,16 +37,26 @@ public class HungrySnake implements Snake {
         getMyPosition();
         if (ownSnake.health < HUNGRY_THRESHOULD) {
             moveToFood();
+        } else {
+            followOwnTail();
         }
         avoidCollision();
         return nextMove;
     }
 
+    private void followOwnTail() {
+        Path path = pathfinder.findPath(board, ownSnake.headPosition, ownSnake.tailPosition);
+        Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
+        nextMove = ownSnake.headPosition.directionTo(nextField);
+    }
+
     private void getMyPosition() {
-        JsonNode snakeHead = moveRequest.get("you").get("body").get(0);
-        int bodyLength = moveRequest.get("you").get("body").size();
+        JsonNode snakeBody = moveRequest.get("you").get("body");
+        int snakeSize = snakeBody.size();
+        JsonNode snakeHead = snakeBody.get(0);
+        JsonNode snakeTail = snakeBody.get(snakeSize - 1);
         int health = moveRequest.get("you").get("health").asInt();
-        ownSnake = new SnakeStats(Field.of(snakeHead), bodyLength, health);
+        ownSnake = new SnakeStats(Field.of(snakeHead), Field.of(snakeTail), snakeSize, health);
     }
 
     private void moveToFood() {
@@ -86,14 +93,25 @@ public class HungrySnake implements Snake {
     }
 
     private void avoidSelf() {
-        Collection<Field> snakeBody = new HashSet<>();
+        List<Field> snakeBody = new LinkedList<>();
         for (JsonNode jsonNode : moveRequest.get("you").get("body")) {
             snakeBody.add(Field.of(jsonNode));
         }
+        if (ownSnake.length <= 2) {
+            avoidSnakeBody(snakeBody);
+        } else {
+            avoidSnakeBodyIgnoringTail(snakeBody);
+        }
+    }
+
+    private void avoidSnakeBodyIgnoringTail(List<Field> snakeBody) {
+        // TODO SnakeBodies in one place
+        // ignore snake tails -> they move away
+        snakeBody.remove(snakeBody.size() - 1);
         avoidSnakeBody(snakeBody);
     }
 
-    private void avoidSnakeBody(Collection<Field> snakeBody) {
+    private void avoidSnakeBody(List<Field> snakeBody) {
         badDirections.addAll(snakeBody.stream()
                                       .filter(it -> ownSnake.headPosition.distanceTo(it) == 1)
                                       .map(it -> ownSnake.headPosition.directionTo(it))
@@ -103,9 +121,15 @@ public class HungrySnake implements Snake {
     private void avoidSnakeHeadCollision() {
         Collection<SnakeStats> snakeStats = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
-                snake -> snakeStats.add(new SnakeStats(Field.of(snake.get("body").get(0)),
-                        snake.get("body").size(),
-                        snake.get("health").asInt())));
+                snake -> {
+                    JsonNode body = snake.get("body");
+                    int bodySize = snake.get("body").size();
+                    snakeStats.add(new SnakeStats(
+                            Field.of(body.get(0)),
+                            Field.of(body.get(bodySize - 1)),
+                            body.size(),
+                            snake.get("health").asInt()));
+                });
         HashSet<String> dangerousDirections = snakeStats.stream()
                                                         .filter(potentiallyCollidingSnakes())
                                                         .filter(equalOrLargerSnakes())
@@ -137,13 +161,15 @@ public class HungrySnake implements Snake {
     }
 
     private void avoidOtherSnakes() {
-        Collection<Field> snakeBodies = new LinkedList<>();
+        List<Field> snakeBodies = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
                 snake -> snake.get("body").forEach(
                         element -> snakeBodies.add(Field.of(element))
                 )
         );
-        avoidSnakeBody(snakeBodies);
+        // TODO: SnakeBodies in single place
+        snakeBodies.removeIf(it -> it.equals(ownSnake.tailPosition));
+        avoidSnakeBodyIgnoringTail(snakeBodies);
     }
 
     private void moveSafely() {
@@ -160,11 +186,13 @@ public class HungrySnake implements Snake {
 
     private static class SnakeStats {
         final Field headPosition;
+        final Field tailPosition;
         final int length;
         final int health;
 
-        SnakeStats(Field headPosition, int length, int health) {
+        SnakeStats(Field headPosition, Field tailPosition, int length, int health) {
             this.headPosition = headPosition;
+            this.tailPosition = tailPosition;
             this.length = length;
             this.health = health;
         }

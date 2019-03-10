@@ -32,10 +32,17 @@ public class Board {
     private Collection<Field> allSnakeBodies() {
         Collection<Field> allSnakeBodies = new HashSet<>();
 
+        // TODO SnakeBodies in one place
         jsonNode.get("board").get("snakes").forEach(
-                snake -> snake.get("body").forEach(
-                        element -> allSnakeBodies.add(Field.of(element))
-                )
+                snake -> {
+                    Iterator<JsonNode> elIt = snake.get("body").iterator();
+                    while (elIt.hasNext()) {
+                        JsonNode next = elIt.next();
+                        if (elIt.hasNext()) {
+                            allSnakeBodies.add(Field.of(next));
+                        }
+                    }
+                }
         );
 
         return allSnakeBodies;
