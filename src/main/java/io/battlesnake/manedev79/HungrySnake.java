@@ -45,7 +45,8 @@ public class HungrySnake implements Snake {
     private void getMyPosition() {
         JsonNode snakeHead = moveRequest.get("you").get("body").get(0);
         int bodyLength = moveRequest.get("you").get("body").size();
-        ownSnake = new SnakeStats(Field.of(snakeHead), bodyLength);
+        int health = moveRequest.get("you").get("health").asInt();
+        ownSnake = new SnakeStats(Field.of(snakeHead), bodyLength, health);
     }
 
     private void moveToFood() {
@@ -99,7 +100,9 @@ public class HungrySnake implements Snake {
     private void avoidSnakeHeadCollision() {
         Collection<SnakeStats> snakeStats = new LinkedList<>();
         moveRequest.get("board").get("snakes").forEach(
-                snake -> snakeStats.add(new SnakeStats(Field.of(snake.get("body").get(0)), snake.get("body").size())));
+                snake -> snakeStats.add(new SnakeStats(Field.of(snake.get("body").get(0)),
+                        snake.get("body").size(),
+                        snake.get("health").asInt())));
         HashSet<String> dangerousDirections = snakeStats.stream()
                                                         .filter(potentiallyCollidingSnakes())
                                                         .filter(equalOrLargerSnakes())
@@ -155,10 +158,12 @@ public class HungrySnake implements Snake {
     private static class SnakeStats {
         final Field headPosition;
         final int length;
+        final int health;
 
-        SnakeStats(Field headPosition, int length) {
+        SnakeStats(Field headPosition, int length, int health) {
             this.headPosition = headPosition;
             this.length = length;
+            this.health = health;
         }
     }
 }
