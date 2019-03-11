@@ -86,7 +86,7 @@ class SnakeHandler {
         return EMPTY;
     }
 
-    private Snake getSnake() {
+    private SnakeAI getSnake() {
         return new HungrySnake(new Pathfinder(executorService));
     }
 }
