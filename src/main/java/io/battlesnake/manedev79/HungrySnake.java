@@ -21,6 +21,7 @@ public class HungrySnake implements SnakeAI {
     private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
+    private Collection<String> preferredDirections = new HashSet<>();
     private Snake ownSnake;
     private Board board;
     private Pathfinder pathfinder;
@@ -33,16 +34,23 @@ public class HungrySnake implements SnakeAI {
     @Override
     public String determineNextMove(final JsonNode moveRequest) {
         this.moveRequest = moveRequest;
-        this.board = Board.of(moveRequest);
-        this.ownSnake = new Snake(moveRequest.get("you"));
-        this.otherSnakes = getOtherSnakes(moveRequest);
+        board = Board.of(moveRequest);
+        ownSnake = new Snake(moveRequest.get("you"));
+        otherSnakes = getOtherSnakes(moveRequest);
 
         if (ownSnake.health < HUNGRY_THRESHOULD || !isLongestSnake(ownSnake)) {
             moveToFood();
         } else {
             followOwnTail();
         }
-        avoidCollision();
+
+        avoidSelf();
+        avoidWalls();
+        avoidOtherSnakes();
+        avoidSnakeHeadCollision();
+        eatTheWeak();
+
+        moveSafely();
         return nextMove;
     }
 
@@ -56,14 +64,14 @@ public class HungrySnake implements SnakeAI {
     private void followOwnTail() {
         Path path = pathfinder.findPath(board, ownSnake.headPosition, ownSnake.tailPosition);
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
-        nextMove = ownSnake.headPosition.directionTo(nextField);
+        preferredDirections.add(ownSnake.headPosition.directionTo(nextField));
     }
 
     private void moveToFood() {
         Field foodLocation = closestFoodLocation(moveRequest);
         Path path = pathfinder.findPath(board, ownSnake.headPosition, foodLocation);
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
-        nextMove = ownSnake.headPosition.directionTo(nextField);
+        preferredDirections.add(ownSnake.headPosition.directionTo(nextField));
     }
 
     private Field closestFoodLocation(JsonNode moveRequest) {
@@ -79,17 +87,6 @@ public class HungrySnake implements SnakeAI {
         int distanceToFirst = ownSnake.headPosition.distanceTo(firstFood);
         int distanceToSecond = ownSnake.headPosition.distanceTo(secondFood);
         return Integer.compare(distanceToFirst, distanceToSecond);
-    }
-
-    private void avoidCollision() {
-        badDirections = new HashSet<>();
-        dangerousDirections = new HashSet<>();
-        avoidSelf();
-        avoidWalls();
-        avoidOtherSnakes();
-        avoidSnakeHeadCollision();
-
-        moveSafely();
     }
 
     private void avoidSelf() {
@@ -113,9 +110,19 @@ public class HungrySnake implements SnakeAI {
                                                          .filter(equalOrLargerSnakes())
                                                          .map(allPossibleDirections())
                                                          .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
-        this.badDirections.addAll(dangerousDirections);
         this.dangerousDirections.addAll(dangerousDirections);
     }
+
+
+    private void eatTheWeak() {
+        HashSet<String> killDirections = otherSnakes.stream()
+                                                    .filter(potentiallyCollidingSnakes())
+                                                    .filter(smallerSnakes())
+                                                    .map(allPossibleDirections())
+                                                    .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+        this.preferredDirections.addAll(killDirections);
+    }
+
 
     private Collection<Snake> getOtherSnakes(JsonNode moveRequest) {
         Collection<Snake> otherSnakes = new LinkedList<>();
@@ -137,6 +144,10 @@ public class HungrySnake implements SnakeAI {
         return it -> it.length >= ownSnake.length;
     }
 
+    private Predicate<Snake> smallerSnakes() {
+        return equalOrLargerSnakes().negate();
+    }
+
     private Predicate<Snake> potentiallyCollidingSnakes() {
         return it -> ownSnake.headPosition.distanceTo(it.headPosition) == 2;
     }
@@ -155,14 +166,30 @@ public class HungrySnake implements SnakeAI {
     }
 
     private void moveSafely() {
-        if (badDirections.contains(nextMove)) {
-            nextMove = ALL_DIRECTIONS.stream()
-                                     .filter(i -> !badDirections.contains(i))
-                                     .findFirst()
-                                     .orElse(dangerousDirections.stream()
-                                                                .findFirst()
-                                                                .orElse(DEFAULT_DIRECTION));
-        }
+        Collection<String> preferredAndSafeDirections = preferredDirections.stream()
+                                                                           .filter(it -> !badDirections.contains(it))
+                                                                           .filter(it -> !dangerousDirections.contains(it))
+                                                                           .collect(Collectors.toList());
+        Collection<String> dangerousButNotFatalDirections = dangerousDirections.stream()
+                                                                                .filter(it -> !badDirections.contains(it))
+                                                                                .collect(Collectors.toList());
+        Collection<String> safeDirections = ALL_DIRECTIONS.stream()
+                                                          .filter(it -> !badDirections.contains(it))
+                                                          .filter(it -> !dangerousDirections.contains(it))
+                                                          .collect(Collectors.toList());
+
+        nextMove = preferredAndSafeDirections.stream()
+                                             .findFirst()
+                                             .orElse(safeDirections
+                                                     .stream()
+                                                     .findFirst()
+                                                     .orElse(dangerousButNotFatalDirections
+                                                             .stream()
+                                                             .findFirst()
+                                                             .orElse(dangerousDirections
+                                                                     .stream()
+                                                                     .findFirst()
+                                                                     .orElse(DEFAULT_DIRECTION))));
         LOG.debug("Next move: {}", nextMove);
     }
 }

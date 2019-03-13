@@ -52,7 +52,6 @@ class HungrySnakeTest {
         assertNotEquals("down", snake.nextMove);
     }
 
-    @Disabled
     @Test
     void killShorterSnake() {
         JsonNode board = givenBoard("/hungry-snake-test/killShorterSnake.json");
@@ -87,6 +86,34 @@ class HungrySnakeTest {
         determineMovement(board);
 
         assertEquals("up", snake.nextMove);
+    }
+
+    @Test
+    void avoidBodyCollision() {
+        JsonNode board = givenBoard("/hungry-snake-test/avoidBodyCollision.json");
+
+        determineMovement(board);
+
+        assertNotEquals("left", snake.nextMove);
+        assertNotEquals("right", snake.nextMove);
+    }
+
+    @Test
+    void avoidOwnBodyCollision() {
+        JsonNode board = givenBoard("/hungry-snake-test/avoidOwnBodyCollision.json");
+
+        determineMovement(board);
+
+        assertEquals("down", snake.nextMove);
+    }
+
+    @Test
+    void bewareOfLongerSnake() {
+        JsonNode board = givenBoard("/hungry-snake-test/bewareOfLongerSnake.json");
+
+        determineMovement(board);
+
+        assertEquals("left", snake.nextMove);
     }
 
     private JsonNode givenBoard(String fileName) {

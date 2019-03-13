@@ -25,7 +25,7 @@ public class Snake {
         this.tailPosition = tempBody.getLast();
         this.body = unmodifiableList(tempBody);
         this.length = tempBody.size();
-        this.bodyWithoutTail = unmodifiableList(tempBody.subList(0, length - 2));
+        this.bodyWithoutTail = unmodifiableList(tempBody.subList(0, length - 1));
     }
 
     private LinkedList<Field> getBody(JsonNode jsonBody) {
