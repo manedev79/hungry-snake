@@ -1,28 +1,28 @@
 package io.battlesnake.manedev79.game;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static java.lang.Integer.signum;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toList;
 
 public class Board {
-    private static final Logger LOG = LoggerFactory.getLogger(Board.class);
     private final int maxX;
     private final int maxY;
     private final Collection<Field> blockedFields;
     private JsonNode jsonNode;
+    public final Snake ownSnake;
+    public final Set<Snake> otherSnakes;
 
 
     private Board(JsonNode jsonNode) {
-
         this.jsonNode = jsonNode;
-        this.maxX = jsonNode.get("board").get("width").asInt() - 1;
-        this.maxY = jsonNode.get("board").get("height").asInt() - 1;
-        this.blockedFields = allSnakeBodies();
+        maxX = jsonNode.get("board").get("width").asInt() - 1;
+        maxY = jsonNode.get("board").get("height").asInt() - 1;
+        ownSnake = new Snake(jsonNode.get("you"));
+        otherSnakes = unmodifiableSet(getOtherSnakes(jsonNode));
+        blockedFields = allSnakeBodies();
     }
 
     public Field middleField() {
@@ -30,20 +30,8 @@ public class Board {
     }
 
     private Collection<Field> allSnakeBodies() {
-        Collection<Field> allSnakeBodies = new HashSet<>();
-
-        // TODO SnakeBodies in one place
-        jsonNode.get("board").get("snakes").forEach(
-                snake -> {
-                    Iterator<JsonNode> elIt = snake.get("body").iterator();
-                    while (elIt.hasNext()) {
-                        JsonNode next = elIt.next();
-                        if (elIt.hasNext()) {
-                            allSnakeBodies.add(Field.of(next));
-                        }
-                    }
-                }
-        );
+        Collection<Field> allSnakeBodies = new HashSet<>(ownSnake.bodyWithoutTail);
+        otherSnakes.forEach(otherSnake -> allSnakeBodies.addAll(otherSnake.bodyWithoutTail));
 
         return allSnakeBodies;
     }
@@ -70,4 +58,33 @@ public class Board {
 
         return neighbors.stream().filter(it -> !blockedFields.contains(it)).collect(toList());
     }
+
+    public Field closestFoodLocation() {
+        Collection<Field> foodLocations = new LinkedList<>();
+        jsonNode.get("board").get("food").forEach(food -> foodLocations.add(Field.of(food)));
+
+        return foodLocations.stream()
+                            .min(this::compareDistanceFromCurrentPosition)
+                            .orElse(middleField());
+    }
+
+    private int compareDistanceFromCurrentPosition(Field firstFood, Field secondFood) {
+        int distanceToFirst = ownSnake.headPosition.distanceTo(firstFood);
+        int distanceToSecond = ownSnake.headPosition.distanceTo(secondFood);
+        return Integer.compare(distanceToFirst, distanceToSecond);
+    }
+
+
+    private Set<Snake> getOtherSnakes(JsonNode moveRequest) {
+        Set<Snake> otherSnakes = new HashSet<>();
+        moveRequest.get("board").get("snakes").forEach(
+                snake -> {
+                    Snake otherSnake = new Snake(snake);
+                    if (!otherSnake.equals(ownSnake)) {
+                        otherSnakes.add(otherSnake);
+                    }
+                });
+        return otherSnakes;
+    }
+
 }
