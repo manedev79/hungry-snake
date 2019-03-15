@@ -15,7 +15,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class Pathfinder {
     private static final boolean INTERRUPT_IF_RUNNING = true;
-    private static final int PATHFINDER_TIMEOUT_MILLIS = 200;
+    private static final int PATHFINDER_TIMEOUT_MILLIS = 150;
     private static final Logger LOG = LoggerFactory.getLogger(Pathfinder.class);
     private final ExecutorService executorService;
 
