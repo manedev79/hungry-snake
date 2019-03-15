@@ -38,7 +38,6 @@ class SnakeHandler {
      */
     Map<String, String> process(Request req, Response res) {
         try {
-            JsonNode parsedRequest = JSON_MAPPER.readTree(req.body());
             String uri = req.uri();
             LOG.info("{} called with: {}", uri, req.body());
             Map<String, String> snakeResponse;
@@ -47,10 +46,10 @@ class SnakeHandler {
                     snakeResponse = ping();
                     break;
                 case "/move":
-                    snakeResponse = move(parsedRequest);
+                    snakeResponse = move(JSON_MAPPER.readTree(req.body()));
                     break;
                 case "/end":
-                    snakeResponse = end(parsedRequest);
+                    snakeResponse = end(JSON_MAPPER.readTree(req.body()));
                     break;
                 default:
                     throw new IllegalAccessError("Strange call made to the snake: " + uri);
