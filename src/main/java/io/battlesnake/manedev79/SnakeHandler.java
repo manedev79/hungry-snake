@@ -17,7 +17,7 @@ class SnakeHandler {
     private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
     private static final Map<String, String> EMPTY = new HashMap<>();
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
-    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * /ping is called by the play application during the tournament or on play.battlesnake.io to make sure your
