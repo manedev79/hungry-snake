@@ -19,6 +19,10 @@ public class Field {
         return new Field(jsonCoordinates.get("x").asInt(), jsonCoordinates.get("y").asInt());
     }
 
+    public static Field of(int x, int y) {
+        return new Field(x, y);
+    }
+
     public String directionTo(Field other) {
         if (x < other.x) return "right";
         if (x > other.x) return "left";

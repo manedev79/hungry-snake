@@ -1,0 +1,35 @@
+{
+  "game": {
+    "id": "game-id-string"
+  },
+  "turn": 1,
+  "board": {
+    "height": 19,
+    "width": 19,
+    "food": [],
+    "snakes": [
+      {
+        "id": "snake-id-string",
+        "name": "Sneky Snek",
+        "health": 90,
+        "body": [
+          {
+            "x": 0,
+            "y": 14
+          }
+        ]
+      }
+    ]
+  },
+  "you": {
+    "id": "snake-id-string",
+    "name": "Sneky Snek",
+    "health": 90,
+    "body": [
+      {
+        "x": 0,
+        "y": 14
+      }
+    ]
+  }
+}

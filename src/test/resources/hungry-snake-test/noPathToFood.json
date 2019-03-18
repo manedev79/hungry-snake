@@ -16,7 +16,7 @@
       {
         "id": "c2891d6f-687f-4bc7-9e33-ad874d5db6d8",
         "name": "snaki_snaki",
-        "health": 97,
+        "health": 44,
         "body": [
           {
             "x": 7,
@@ -165,7 +165,7 @@
   "you": {
     "id": "c2891d6f-687f-4bc7-9e33-ad874d5db6d8",
     "name": "snaki_snaki",
-    "health": 97,
+    "health": 44,
     "body": [
       {
         "x": 7,

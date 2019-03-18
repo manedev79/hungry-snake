@@ -18,6 +18,8 @@ class SnakeHandler {
     private static final Map<String, String> EMPTY = new HashMap<>();
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     private ExecutorService executorService = Executors.newCachedThreadPool();
+    private StopWatch stopWatch = new StopWatch();
+
 
     /**
      * /ping is called by the play application during the tournament or on play.battlesnake.io to make sure your
@@ -38,8 +40,9 @@ class SnakeHandler {
      */
     Map<String, String> process(Request req, Response res) {
         try {
+            stopWatch.start();
             String uri = req.uri();
-            LOG.info("{} called with: {}", uri, req.body());
+            LOG.debug("{} called with: {}", uri, req.body());
             Map<String, String> snakeResponse;
             switch (uri) {
                 case "/ping":
@@ -54,7 +57,8 @@ class SnakeHandler {
                 default:
                     throw new IllegalAccessError("Strange call made to the snake: " + uri);
             }
-            LOG.info("Responding with: {}", JSON_MAPPER.writeValueAsString(snakeResponse));
+            LOG.debug("Responding with: {}", JSON_MAPPER.writeValueAsString(snakeResponse));
+            stopWatch.stop();
             return snakeResponse;
         } catch (Exception e) {
             LOG.warn("Something went wrong!", e);
@@ -69,7 +73,6 @@ class SnakeHandler {
      * @return a response back to the engine containing snake movement values.
      */
     private Map<String, String> move(JsonNode moveRequest) {
-        LOG.info(moveRequest.asText());
         Map<String, String> response = new HashMap<>();
         response.put("move", getSnake().determineNextMove(moveRequest));
         return response;

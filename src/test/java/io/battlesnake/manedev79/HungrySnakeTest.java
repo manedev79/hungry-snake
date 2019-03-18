@@ -79,6 +79,7 @@ class HungrySnakeTest {
         assertEquals("down", snake.nextMove);
     }
 
+    @Disabled("Rather kill than idle")
     @Test
     void chaseTail() {
         JsonNode board = givenBoard("/hungry-snake-test/chasingTail.json");

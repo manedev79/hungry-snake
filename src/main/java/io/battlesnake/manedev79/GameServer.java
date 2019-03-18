@@ -51,7 +51,7 @@ public class GameServer {
      * @return a response back to the engine containing the snake setup values.
      */
     private static JsonNode start(Request startRequest, Response res) {
-        LOG.debug(startRequest.toString());
+        LOG.debug("START:" + startRequest.toString());
 
         try {
             return JSON_MAPPER.readTree(GameServer.class.getResourceAsStream("/snakeConfig.json"));

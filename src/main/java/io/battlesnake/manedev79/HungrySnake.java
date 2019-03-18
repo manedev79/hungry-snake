@@ -40,7 +40,7 @@ public class HungrySnake implements SnakeAI {
         if (board.ownSnake.health < HUNGRY_THRESHOLD || !isLongestSnake(board.ownSnake)) {
             moveToFood();
         } else {
-            followOwnTail();
+            chaseShortestSnake();
         }
 
         avoidSelf();
@@ -53,11 +53,24 @@ public class HungrySnake implements SnakeAI {
         return nextMove;
     }
 
+    private void chaseShortestSnake() {
+        Field shortesSnakeHead = board.otherSnakes.stream().reduce((snake, snake2) -> {
+            if (snake.length < snake2.length) {
+                return snake;
+            } else {
+                return snake2;
+            }
+        }).map(snake -> snake.headPosition).orElse(board.middleField());
+        LOG.debug("Shortest snake head is at {}", shortesSnakeHead);
+
+        preferredDirections.addAll(board.ownSnake.headPosition.directionsTo(shortesSnakeHead));
+    }
+
     private boolean isLongestSnake(Snake snake) {
         return board.otherSnakes.stream()
-                          .filter(otherSnake -> !otherSnake.id.equals(snake.id))
-                          .map(otherSnake -> snake.length > otherSnake.length)
-                          .reduce(TRUE, Boolean::logicalAnd);
+                                .filter(otherSnake -> !otherSnake.id.equals(snake.id))
+                                .map(otherSnake -> snake.length > otherSnake.length)
+                                .reduce(TRUE, Boolean::logicalAnd);
     }
 
     private void followOwnTail() {
@@ -90,20 +103,20 @@ public class HungrySnake implements SnakeAI {
 
     private void avoidSnakeHeadCollision() {
         HashSet<String> dangerousDirections = board.otherSnakes.stream()
-                                                         .filter(potentiallyCollidingSnakes())
-                                                         .filter(equalOrLargerSnakes())
-                                                         .map(allPossibleDirections())
-                                                         .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+                                                               .filter(potentiallyCollidingSnakes())
+                                                               .filter(equalOrLargerSnakes())
+                                                               .map(allPossibleDirections())
+                                                               .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
         this.dangerousDirections.addAll(dangerousDirections);
     }
 
 
     private void eatTheWeak() {
         HashSet<String> killDirections = board.otherSnakes.stream()
-                                                    .filter(potentiallyCollidingSnakes())
-                                                    .filter(smallerSnakes())
-                                                    .map(allPossibleDirections())
-                                                    .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+                                                          .filter(potentiallyCollidingSnakes())
+                                                          .filter(smallerSnakes())
+                                                          .map(allPossibleDirections())
+                                                          .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
         this.preferredDirections.addAll(killDirections);
     }
 
@@ -142,8 +155,8 @@ public class HungrySnake implements SnakeAI {
                                                                            .filter(it -> !dangerousDirections.contains(it))
                                                                            .collect(Collectors.toList());
         Collection<String> dangerousButNotFatalDirections = dangerousDirections.stream()
-                                                                                .filter(it -> !badDirections.contains(it))
-                                                                                .collect(Collectors.toList());
+                                                                               .filter(it -> !badDirections.contains(it))
+                                                                               .collect(Collectors.toList());
         Collection<String> safeDirections = ALL_DIRECTIONS.stream()
                                                           .filter(it -> !badDirections.contains(it))
                                                           .filter(it -> !dangerousDirections.contains(it))

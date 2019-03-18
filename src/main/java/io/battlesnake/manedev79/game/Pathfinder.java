@@ -39,7 +39,7 @@ public class Pathfinder {
         try {
             path = pathToFood.get(PATHFINDER_TIMEOUT_MILLIS, MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOG.warn("Unable to calculate path to {}!", destination);
+            LOG.warn("Calculating path to {} took too long!", destination);
             pathToFood.cancel(INTERRUPT_IF_RUNNING);
         }
 
@@ -53,7 +53,6 @@ public class Pathfinder {
         fScore.put(start, start.distanceTo(destination));
 
         while (!openSet.isEmpty()) {
-            LOG.debug("OpenSet head:{}, all {}", openSet.peek(), openSet);
             Field current = openSet.remove();
             if (current.equals(destination)) {
                 return reconstructPath(cameFrom, current);
@@ -72,6 +71,7 @@ public class Pathfinder {
                                          }
                                  );
         }
+        LOG.info("There is no path from {} to {}", start, destination);
         //noinspection unchecked
         return Collections.EMPTY_LIST;
     }

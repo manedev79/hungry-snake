@@ -1,0 +1,58 @@
+{
+  "game": {
+    "id": "eef2acd5-768b-41de-876b-6d4eb52f1c53"
+  },
+  "turn": 1,
+  "board": {
+    "height": 19,
+    "width": 19,
+    "food": [],
+    "snakes": [
+      {
+        "id": "6fadec7c-41a4-43d9-955a-b8ddef58ab93",
+        "name": "Schnäck_3",
+        "health": 94,
+        "body": [
+          {
+            "x": 0,
+            "y": 14
+          }
+        ]
+      },
+      {
+        "id": "e2bf48aa-aa62-46d7-bd7a-f3a0fa130336",
+        "name": "Schnäck_4",
+        "health": 90,
+        "body": [
+          {
+            "x": 18,
+            "y": 17
+          },
+          {
+            "x": 17,
+            "y": 17
+          },
+          {
+            "x": 17,
+            "y": 18
+          },
+          {
+            "x": 16,
+            "y": 18
+          }
+        ]
+      }
+    ]
+  },
+  "you": {
+    "id": "6fadec7c-41a4-43d9-955a-b8ddef58ab93",
+    "name": "Schnäck_3",
+    "health": 94,
+    "body": [
+      {
+        "x": 0,
+        "y": 14
+      }
+    ]
+  }
+}
