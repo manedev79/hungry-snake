@@ -58,9 +58,9 @@ public class Pathfinder {
                 return reconstructPath(cameFrom, current);
             }
             closedSet.add(current);
-            board.getNeighbors(current).stream()
-                                 .filter(it -> !closedSet.contains(it))
-                                 .forEach(neighbor -> {
+            board.getFreeAdjacentFields(current).stream()
+                 .filter(it -> !closedSet.contains(it))
+                 .forEach(neighbor -> {
                                              int tentativeGScore = gScoreFor(current) + current.distanceTo(neighbor);
                                              openSet.add(neighbor);
                                              if (tentativeGScore < gScoreFor(neighbor)) {

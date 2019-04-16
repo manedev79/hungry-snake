@@ -20,7 +20,7 @@ class BoardTest {
 
     @Test
     void neighbors() {
-        Collection<Field> neighbors = board.getNeighbors(new Field(1, 1));
+        Collection<Field> neighbors = board.getFreeAdjacentFields(new Field(1, 1));
         assertTrue(neighbors.contains(new Field(1, 0)));
         assertTrue(neighbors.contains(new Field(0, 1)));
         assertTrue(neighbors.contains(new Field(1, 2)));
@@ -30,7 +30,7 @@ class BoardTest {
 
     @Test
     void neighborsTopLeft() {
-        Collection<Field> neighbors = board.getNeighbors(new Field(0, 0));
+        Collection<Field> neighbors = board.getFreeAdjacentFields(new Field(0, 0));
         assertTrue(neighbors.contains(new Field(1, 0)));
         assertTrue(neighbors.contains(new Field(0, 1)));
         assertEquals(2, neighbors.size());
@@ -38,7 +38,7 @@ class BoardTest {
 
     @Test
     void neighborsLowerRight() {
-        Collection<Field> neighbors = board.getNeighbors(new Field(14, 14));
+        Collection<Field> neighbors = board.getFreeAdjacentFields(new Field(14, 14));
         assertTrue(neighbors.contains(new Field(13, 14)));
         assertTrue(neighbors.contains(new Field(14, 13)));
         assertEquals(2, neighbors.size());

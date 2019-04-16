@@ -40,7 +40,7 @@ public class Board {
         return new Board(jsonNode);
     }
 
-    Collection<Field> getNeighbors(Field current) {
+    public Collection<Field> getFreeAdjacentFields(Field current) {
         List<Field> neighbors = new ArrayList<>();
 
         if (current.x > 0) {

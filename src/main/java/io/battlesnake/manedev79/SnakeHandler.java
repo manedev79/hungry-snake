@@ -2,6 +2,7 @@ package io.battlesnake.manedev79;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.battlesnake.manedev79.game.Board;
 import io.battlesnake.manedev79.game.Pathfinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 class SnakeHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SnakeHandler.class);
     private static final Map<String, String> EMPTY = new HashMap<>();
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     private ExecutorService executorService = Executors.newCachedThreadPool();
@@ -85,6 +86,8 @@ class SnakeHandler {
      * @return responses back to the engine are ignored.
      */
     private Map<String, String> end(JsonNode endRequest) {
+        Board board = Board.of(endRequest);
+        LOG.info("=== Game {} ended. Snake length: {}", endRequest.get("game").get("id").asText(), board.ownSnake.length);
         return EMPTY;
     }
 

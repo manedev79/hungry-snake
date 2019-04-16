@@ -5,10 +5,7 @@ import io.battlesnake.manedev79.game.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -47,10 +44,23 @@ public class HungrySnake implements SnakeAI {
         avoidWalls();
         avoidOtherSnakes();
         avoidSnakeHeadCollision();
+        avoidDeadEnds();
         eatTheWeak();
 
         moveSafely();
         return nextMove;
+    }
+
+    private void avoidDeadEnds() {
+        Lookahead lookahead = new Lookahead(board);
+
+        Set<String> nonDeadendDirections = lookahead.findPathsFrom(board.ownSnake.headPosition).stream()
+                                                    .map(path -> board.ownSnake.headPosition.directionTo(path.getFirstStep()))
+                                                    .collect(Collectors.toSet());
+        LOG.debug("Free directions: {}", nonDeadendDirections);
+        badDirections.addAll(ALL_DIRECTIONS.stream()
+                                           .filter(direction -> !nonDeadendDirections.contains(direction))
+                                           .collect(Collectors.toList()));
     }
 
     private void chaseShortestSnake() {
@@ -153,27 +163,34 @@ public class HungrySnake implements SnakeAI {
         Collection<String> preferredAndSafeDirections = preferredDirections.stream()
                                                                            .filter(it -> !badDirections.contains(it))
                                                                            .filter(it -> !dangerousDirections.contains(it))
-                                                                           .collect(Collectors.toList());
+                                                                           .collect(Collectors.toSet());
         Collection<String> dangerousButNotFatalDirections = dangerousDirections.stream()
                                                                                .filter(it -> !badDirections.contains(it))
-                                                                               .collect(Collectors.toList());
+                                                                               .collect(Collectors.toSet());
         Collection<String> safeDirections = ALL_DIRECTIONS.stream()
                                                           .filter(it -> !badDirections.contains(it))
                                                           .filter(it -> !dangerousDirections.contains(it))
                                                           .collect(Collectors.toList());
+        Collection<String> freeDirections = board.getFreeAdjacentFields(board.ownSnake.headPosition)
+                                                 .stream()
+                                                 .map(freeField -> board.ownSnake.headPosition.directionTo(freeField))
+                                                 .collect(Collectors.toSet());
 
         nextMove = preferredAndSafeDirections.stream()
-                                             .findFirst()
+                                             .findAny()
                                              .orElse(safeDirections
                                                      .stream()
-                                                     .findFirst()
+                                                     .findAny()
                                                      .orElse(dangerousButNotFatalDirections
                                                              .stream()
-                                                             .findFirst()
+                                                             .findAny()
                                                              .orElse(dangerousDirections
                                                                      .stream()
-                                                                     .findFirst()
-                                                                     .orElse(DEFAULT_DIRECTION))));
+                                                                     .findAny()
+                                                                     .orElse(freeDirections
+                                                                             .stream()
+                                                                             .findAny()
+                                                                             .orElse(DEFAULT_DIRECTION)))));
         LOG.debug("Next move: {}", nextMove);
     }
 }
