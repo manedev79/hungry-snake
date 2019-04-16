@@ -1,9 +1,10 @@
 hungry-snake
 ===
-
-![](https://api.travis-ci.com/manedev79/hungry-snake.svg?branch=master)
+![](https://api.travis-ci.com/manedev79/hungry-snake.svg?branch=master)  
 
 A [Battlesnake AI](http://battlesnake.io) written in Java.
+
+![](battlesnake_small.png) 
 
 Visit [https://docs.battlesnake.io](https://docs.battlesnake.io) 
 for API documentation and instructions for running your AI.
