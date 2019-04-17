@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.battlesnake.manedev79</groupId>
     <artifactId>hungry-snake</artifactId>
-    <version>1.8</version>
+    <version>1.9-SNAPSHOT</version>
     <name>hungry-snake</name>
     <description>Hungry battlesnake eating food and snake heads</description>
 
@@ -13,7 +13,7 @@
 
     <scm>
         <developerConnection>scm:git:file://${project.basedir}</developerConnection>
-      <tag>1.8</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <!-- library dependencies -->
