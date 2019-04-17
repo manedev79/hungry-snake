@@ -34,7 +34,9 @@ public class HungrySnake implements SnakeAI {
         this.moveRequest = moveRequest;
         board = Board.of(moveRequest);
 
-        if (board.ownSnake.health < HUNGRY_THRESHOLD || !isLongestSnake(board.ownSnake)) {
+        if (!board.containsFood()) {
+            followOwnTail();
+        } else if (board.ownSnake.health < HUNGRY_THRESHOLD || !isLongestSnake(board.ownSnake)) {
             moveToFood();
         } else {
             chaseShortestSnake();
@@ -84,9 +86,7 @@ public class HungrySnake implements SnakeAI {
     }
 
     private void followOwnTail() {
-        Path path = pathfinder.findPath(board, board.ownSnake.headPosition, board.ownSnake.tailPosition);
-        Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
-        preferredDirections.add(board.ownSnake.headPosition.directionTo(nextField));
+        preferredDirections.addAll(board.ownSnake.headPosition.directionsTo(board.ownSnake.tailPosition));
     }
 
     private void moveToFood() {

@@ -87,4 +87,7 @@ public class Board {
         return otherSnakes;
     }
 
+    public boolean containsFood() {
+        return jsonNode.get("board").get("food").size() > 0;
+    }
 }

@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
 
@@ -42,5 +41,16 @@ class BoardTest {
         assertTrue(neighbors.contains(new Field(13, 14)));
         assertTrue(neighbors.contains(new Field(14, 13)));
         assertEquals(2, neighbors.size());
+    }
+
+    @Test
+    void containsNoFood() {
+        assertFalse(board.containsFood());
+    }
+
+    @Test
+    void containsFood() {
+        board = Board.of(JsonNodes.fromFile("/board-test/boardWithFood.json"));
+        assertTrue(board.containsFood());
     }
 }
