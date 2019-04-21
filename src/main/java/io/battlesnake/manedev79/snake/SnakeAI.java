@@ -1,4 +1,4 @@
-package io.battlesnake.manedev79;
+package io.battlesnake.manedev79.snake;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

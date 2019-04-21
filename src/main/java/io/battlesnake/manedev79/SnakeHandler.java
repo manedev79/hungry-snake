@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.battlesnake.manedev79.game.Board;
 import io.battlesnake.manedev79.game.Pathfinder;
+import io.battlesnake.manedev79.snake.HungrySnake;
+import io.battlesnake.manedev79.snake.SnakeAI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
