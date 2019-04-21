@@ -21,7 +21,7 @@ class SnakeMoodFactory {
         } else if (board.ownSnake.health < HUNGRY_THRESHOLD || !isLongestSnake(board.ownSnake, board)) {
             return new HungryMood(board, pathfinder);
         } else {
-            return new KillerMood(board);
+            return new KillerMood(board, pathfinder);
         }
     }
 
