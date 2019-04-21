@@ -13,16 +13,16 @@ import java.util.concurrent.Executors;
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 
-class HungrySnakeTest {
+class BattleSnakeTest {
     private static final long REQUEST_TIMEOUT = 250L;
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private Pathfinder pathfinder = new Pathfinder(executorService);
-    private HungrySnake snake;
+    private BattleSnake snake;
 
     @BeforeEach
     void setUp() {
-        snake = new HungrySnake(pathfinder);
+        snake = new BattleSnake(pathfinder);
     }
 
     @Test

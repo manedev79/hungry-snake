@@ -10,35 +10,28 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static java.lang.Boolean.TRUE;
-
-public class HungrySnake implements SnakeAI {
-    private static final Logger LOG = LoggerFactory.getLogger(HungrySnake.class);
+public class BattleSnake implements SnakeAI {
+    static final int HUNGRY_THRESHOLD = 50;
+    private static final Logger LOG = LoggerFactory.getLogger(BattleSnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
-    private static final int HUNGRY_THRESHOLD = 50;
+    private final SnakeMoodFactory snakeMoodFactory;
     String nextMove = DEFAULT_DIRECTION;
+    private Board board;
+    private Collection<String> preferredDirections = new HashSet<>();
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
-    private Collection<String> preferredDirections = new HashSet<>();
-    private Board board;
-    private Pathfinder pathfinder;
 
-    public HungrySnake(Pathfinder pathfinder) {
-        this.pathfinder = pathfinder;
+    public BattleSnake(Pathfinder pathfinder) {
+        this.snakeMoodFactory = new SnakeMoodFactory(pathfinder);
     }
 
     @Override
     public String determineNextMove(final JsonNode moveRequest) {
         board = Board.of(moveRequest);
 
-        if (!board.containsFood()) {
-            followOwnTail();
-        } else if (board.ownSnake.health < HUNGRY_THRESHOLD || !isLongestSnake(board.ownSnake)) {
-            moveToFood();
-        } else {
-            chaseShortestSnake();
-        }
+        SnakeMood snakeMood = snakeMoodFactory.determineSnakeMood(board);
+        preferredDirections.addAll(snakeMood.provideDirections());
 
         avoidSelf();
         avoidWalls();
@@ -61,37 +54,6 @@ public class HungrySnake implements SnakeAI {
         badDirections.addAll(ALL_DIRECTIONS.stream()
                                            .filter(direction -> !nonDeadendDirections.contains(direction))
                                            .collect(Collectors.toList()));
-    }
-
-    private void chaseShortestSnake() {
-        Field shortesSnakeHead = board.otherSnakes.stream().reduce((snake, snake2) -> {
-            if (snake.length < snake2.length) {
-                return snake;
-            } else {
-                return snake2;
-            }
-        }).map(snake -> snake.headPosition).orElse(board.middleField()); // TOOD: Do not 'chase' in orElse
-        LOG.debug("Shortest snake head is at {}", shortesSnakeHead);
-
-        preferredDirections.addAll(board.ownSnake.headPosition.directionsTo(shortesSnakeHead));
-    }
-
-    private boolean isLongestSnake(Snake snake) {
-        return board.otherSnakes.stream()
-                                .filter(otherSnake -> !otherSnake.id.equals(snake.id))
-                                .map(otherSnake -> snake.length > otherSnake.length)
-                                .reduce(TRUE, Boolean::logicalAnd);
-    }
-
-    private void followOwnTail() {
-        preferredDirections.addAll(board.ownSnake.headPosition.directionsTo(board.ownSnake.tailPosition));
-    }
-
-    private void moveToFood() {
-        Field foodLocation = board.closestFoodLocation();
-        Path path = pathfinder.findPath(board, board.ownSnake.headPosition, foodLocation);
-        Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
-        preferredDirections.add(board.ownSnake.headPosition.directionTo(nextField));
     }
 
     private void avoidSelf() {
@@ -189,4 +151,5 @@ public class HungrySnake implements SnakeAI {
                                                                              .orElse(DEFAULT_DIRECTION)))));
         LOG.debug("Next move: {}", nextMove);
     }
+
 }

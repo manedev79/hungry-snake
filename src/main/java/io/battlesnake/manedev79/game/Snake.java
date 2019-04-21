@@ -2,7 +2,9 @@ package io.battlesnake.manedev79.game;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 import static java.util.Collections.unmodifiableList;
 
