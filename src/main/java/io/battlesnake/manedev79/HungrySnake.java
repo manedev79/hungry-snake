@@ -18,7 +18,6 @@ public class HungrySnake implements SnakeAI {
     private static final String DEFAULT_DIRECTION = "up";
     private static final int HUNGRY_THRESHOLD = 50;
     String nextMove = DEFAULT_DIRECTION;
-    private JsonNode moveRequest;
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
     private Collection<String> preferredDirections = new HashSet<>();
@@ -31,7 +30,6 @@ public class HungrySnake implements SnakeAI {
 
     @Override
     public String determineNextMove(final JsonNode moveRequest) {
-        this.moveRequest = moveRequest;
         board = Board.of(moveRequest);
 
         if (!board.containsFood()) {
@@ -72,7 +70,7 @@ public class HungrySnake implements SnakeAI {
             } else {
                 return snake2;
             }
-        }).map(snake -> snake.headPosition).orElse(board.middleField());
+        }).map(snake -> snake.headPosition).orElse(board.middleField()); // TOOD: Do not 'chase' in orElse
         LOG.debug("Shortest snake head is at {}", shortesSnakeHead);
 
         preferredDirections.addAll(board.ownSnake.headPosition.directionsTo(shortesSnakeHead));
@@ -147,12 +145,10 @@ public class HungrySnake implements SnakeAI {
     }
 
     private void avoidWalls() {
-        int maxX = moveRequest.get("board").get("width").asInt() - 1;
-        int maxY = moveRequest.get("board").get("height").asInt() - 1;
         if (board.ownSnake.headPosition.x <= 0) badDirections.add("left");
         if (board.ownSnake.headPosition.y <= 0) badDirections.add("up");
-        if (board.ownSnake.headPosition.x >= maxX) badDirections.add("right");
-        if (board.ownSnake.headPosition.y >= maxY) badDirections.add("down");
+        if (board.ownSnake.headPosition.x >= board.maxX) badDirections.add("right");
+        if (board.ownSnake.headPosition.y >= board.maxY) badDirections.add("down");
     }
 
     private void avoidOtherSnakes() {

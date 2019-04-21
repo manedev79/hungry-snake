@@ -8,8 +8,8 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toList;
 
 public class Board {
-    final int maxX;
-    final int maxY;
+    public final int maxX;
+    public final int maxY;
     private final Collection<Field> blockedFields;
     private JsonNode jsonNode;
     public final Snake ownSnake;
