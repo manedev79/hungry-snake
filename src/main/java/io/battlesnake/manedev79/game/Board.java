@@ -68,9 +68,9 @@ public class Board {
                             .orElse(middleField());
     }
 
-    private int compareDistanceFromCurrentPosition(Field firstFood, Field secondFood) {
-        int distanceToFirst = ownSnake.headPosition.distanceTo(firstFood);
-        int distanceToSecond = ownSnake.headPosition.distanceTo(secondFood);
+    public int compareDistanceFromCurrentPosition(Field firstPosition, Field secondPosition) {
+        int distanceToFirst = ownSnake.headPosition.distanceTo(firstPosition);
+        int distanceToSecond = ownSnake.headPosition.distanceTo(secondPosition);
         return Integer.compare(distanceToFirst, distanceToSecond);
     }
 

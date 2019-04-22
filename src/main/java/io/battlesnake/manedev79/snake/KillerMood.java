@@ -24,20 +24,23 @@ public class KillerMood implements SnakeMood {
 
     @Override
     public Collection<String> provideDirections() {
-        return chaseShortestSnake();
+        return chaseClosestShorterSnake();
     }
 
-    private Collection<String> chaseShortestSnake() {
-        Field shortesSnakeHead = board.otherSnakes.stream().reduce((snake, snake2) -> {
-            if (snake.length < snake2.length) {
-                return snake;
-            } else {
-                return snake2;
-            }
-        }).map(snake -> snake.headPosition).orElse(board.middleField()); // TOOD: Do not 'chase' in orElse
-        LOG.debug("Shortest snake head is at {}", shortesSnakeHead);
+    private Collection<String> chaseClosestShorterSnake() {
+        Field closestShorterSnakeHead = board.otherSnakes.stream()
+                         .filter(otherSnake -> otherSnake.length < board.ownSnake.length)
+                         .reduce((snake, snake2) -> {
+                             if (board.compareDistanceFromCurrentPosition(snake.headPosition, snake2.headPosition) > 0) {
+                                return snake2;
+                             } else {
+                                 return snake;
+                             }
+                         }).map(snake -> snake.headPosition).orElse(board.middleField());
 
-        Path path = pathfinder.findPath(board, board.ownSnake.headPosition, shortesSnakeHead);
+        LOG.debug("Closest shorter snake head is at {}", closestShorterSnakeHead);
+
+        Path path = pathfinder.findPath(board, board.ownSnake.headPosition, closestShorterSnakeHead);
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
         return singletonList(board.ownSnake.headPosition.directionTo(nextField));
     }

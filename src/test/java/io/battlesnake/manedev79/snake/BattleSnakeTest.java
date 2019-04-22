@@ -1,6 +1,7 @@
 package io.battlesnake.manedev79.snake;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.battlesnake.manedev79.game.AStarPathfinder;
 import io.battlesnake.manedev79.game.Pathfinder;
 import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ class BattleSnakeTest {
     private static final long REQUEST_TIMEOUT = 250L;
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private Pathfinder pathfinder = new Pathfinder(executorService);
+    private Pathfinder pathfinder = new AStarPathfinder(executorService);
     private BattleSnake snake;
 
     @BeforeEach

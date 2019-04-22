@@ -24,7 +24,7 @@ class PathfinderPerformanceTest {
     @BeforeEach
     void setUp() {
         stopWatch = new StopWatch();
-        pathfinder = new Pathfinder(executorService);
+        pathfinder = new AStarPathfinder(executorService);
     }
 
     @Test

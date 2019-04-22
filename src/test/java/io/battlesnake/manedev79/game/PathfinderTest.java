@@ -16,7 +16,7 @@ class PathfinderTest {
 
     @BeforeEach
     void setUp() {
-        pathfinder = new Pathfinder(Executors.newSingleThreadExecutor());
+        pathfinder = new AStarPathfinder(Executors.newSingleThreadExecutor());
     }
 
     @Test
