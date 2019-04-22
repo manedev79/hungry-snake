@@ -32,6 +32,10 @@ public class Field {
     }
 
     public Collection<String> directionsTo(Field other) {
+        if (other == null) {
+            return null;
+        }
+
         Collection<String> directions = new HashSet<>();
         if (x < other.x) directions.add("right");
         if (x > other.x) directions.add("left");

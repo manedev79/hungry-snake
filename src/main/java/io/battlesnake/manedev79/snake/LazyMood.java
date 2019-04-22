@@ -3,6 +3,7 @@ package io.battlesnake.manedev79.snake;
 import io.battlesnake.manedev79.game.Board;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class LazyMood implements SnakeMood {
 
@@ -13,8 +14,8 @@ public class LazyMood implements SnakeMood {
     }
 
     @Override
-    public Collection<String> provideDirections() {
-        return followOwnTail();
+    public Optional<Collection<String>> provideDirections() {
+        return Optional.of(followOwnTail());
     }
 
     private Collection<String> followOwnTail() {

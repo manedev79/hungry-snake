@@ -4,18 +4,27 @@ import io.battlesnake.manedev79.game.Board;
 import io.battlesnake.manedev79.game.Pathfinder;
 import io.battlesnake.manedev79.game.Snake;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import static io.battlesnake.manedev79.snake.BattleSnake.HUNGRY_THRESHOLD;
 import static java.lang.Boolean.TRUE;
 
-class SnakeMoodFactory {
+class SnakeMind {
 
     private Pathfinder pathfinder;
 
-    SnakeMoodFactory(Pathfinder pathfinder) {
+    SnakeMind(Pathfinder pathfinder) {
         this.pathfinder = pathfinder;
     }
 
-    SnakeMood determineSnakeMood(Board board) {
+    Collection<String> getPreferredDirections(Board board) {
+        return determineSnakeMood(board).provideDirections()
+                                        .orElse(new LazyMood(board).provideDirections()
+                                                                   .orElse(Collections.singletonList("UP")));
+    }
+
+    private SnakeMood determineSnakeMood(Board board) {
         if (!board.containsFood()) {
             return new LazyMood(board);
         } else if (board.ownSnake.health < HUNGRY_THRESHOLD || !isLongestSnake(board.ownSnake, board)) {

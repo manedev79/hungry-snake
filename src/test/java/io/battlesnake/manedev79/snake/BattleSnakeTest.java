@@ -109,6 +109,17 @@ class BattleSnakeTest {
         assertEquals("down", snake.nextMove);
     }
 
+
+    @Test
+    void avoidOwnBodyCollision2() {
+        JsonNode board = givenBoard("/hungry-snake-test/avoidOwnBodyCollision2.json");
+
+        determineMovement(board);
+
+        assertNotEquals("right", snake.nextMove);
+    }
+
+
     @Test
     void bewareOfLongerSnake() {
         JsonNode board = givenBoard("/hungry-snake-test/bewareOfLongerSnake.json");

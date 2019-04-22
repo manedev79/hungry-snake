@@ -4,23 +4,20 @@ import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Executable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LookaheadTest {
 
-    private Board board;
     private Lookahead lookahead;
 
     @BeforeEach
     void setUp() {
-        board = Board.of(JsonNodes.fromFile("/board-test/emptyBoard.json"));
-        lookahead = new Lookahead(board);
+        Board board = Board.of(JsonNodes.fromFile("/board-test/emptyBoard.json"));
+        lookahead = new Lookahead(board, new DirectWayPathfinder());
     }
 
     @Test

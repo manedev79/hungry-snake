@@ -11,9 +11,11 @@ public class Lookahead {
     private static final int SEARCH_DEPTH = 6;
     private Board board;
     private List<Path> possiblePaths;
+    private Pathfinder pathfinder;
 
-    public Lookahead(Board board) {
+    public Lookahead(Board board, Pathfinder pathfinder) {
         this.board = board;
+        this.pathfinder = pathfinder;
     }
 
     public List<Path> findPathsFrom(Field from) {
@@ -24,8 +26,16 @@ public class Lookahead {
             lookahead(i);
         }
 
-        board.getFreeAdjacentFields(from);
         LOG.trace("Possible paths: {}", possiblePaths);
+
+        if (possiblePaths.isEmpty()) {
+            LOG.trace("Trying to find path to own tail");
+            Path path = pathfinder.findPath(board, board.ownSnake.headPosition, board.ownSnake.tailPosition);
+            if (!path.getSteps().isEmpty()) {
+                possiblePaths.add(path);
+            }
+        }
+
         return possiblePaths;
     }
 

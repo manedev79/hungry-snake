@@ -1,7 +1,8 @@
 package io.battlesnake.manedev79.snake;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface SnakeMood {
-    Collection<String> provideDirections();
+    Optional<Collection<String>> provideDirections();
 }

@@ -11,11 +11,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class BattleSnake implements SnakeAI {
-    static final int HUNGRY_THRESHOLD = 50;
+    static final int HUNGRY_THRESHOLD = 30; // TODO: Verify value
     private static final Logger LOG = LoggerFactory.getLogger(BattleSnake.class);
     private static final Collection<String> ALL_DIRECTIONS = Arrays.asList("up", "down", "left", "right");
     private static final String DEFAULT_DIRECTION = "up";
-    private final SnakeMoodFactory snakeMoodFactory;
+    private final SnakeMind snakeMind;
+    private final Pathfinder pathfinder;
     String nextMove = DEFAULT_DIRECTION;
     private Board board;
     private Collection<String> preferredDirections = new HashSet<>();
@@ -23,29 +24,29 @@ public class BattleSnake implements SnakeAI {
     private Collection<String> dangerousDirections = new HashSet<>();
 
     public BattleSnake(Pathfinder pathfinder) {
-        this.snakeMoodFactory = new SnakeMoodFactory(pathfinder);
+        this.snakeMind = new SnakeMind(pathfinder);
+        this.pathfinder = pathfinder;
     }
 
     @Override
     public String determineNextMove(final JsonNode moveRequest) {
         board = Board.of(moveRequest);
 
-        SnakeMood snakeMood = snakeMoodFactory.determineSnakeMood(board);
-        preferredDirections.addAll(snakeMood.provideDirections());
+        preferredDirections.addAll(snakeMind.getPreferredDirections(board));
 
         avoidSelf();
         avoidWalls();
         avoidOtherSnakes();
         avoidSnakeHeadCollision();
         avoidDeadEnds();
-        eatTheWeak();
+//        eatTheWeak(); // TOOD: Re-enable
 
         moveSafely();
         return nextMove;
     }
 
     private void avoidDeadEnds() {
-        Lookahead lookahead = new Lookahead(board);
+        Lookahead lookahead = new Lookahead(board, pathfinder);
 
         Set<String> nonDeadendDirections = lookahead.findPathsFrom(board.ownSnake.headPosition).stream()
                                                     .map(path -> board.ownSnake.headPosition.directionTo(path.getFirstStep()))
@@ -128,7 +129,7 @@ public class BattleSnake implements SnakeAI {
         Collection<String> safeDirections = ALL_DIRECTIONS.stream()
                                                           .filter(it -> !badDirections.contains(it))
                                                           .filter(it -> !dangerousDirections.contains(it))
-                                                          .collect(Collectors.toList());
+                                                          .collect(Collectors.toSet());
         Collection<String> freeDirections = board.getFreeAdjacentFields(board.ownSnake.headPosition)
                                                  .stream()
                                                  .map(freeField -> board.ownSnake.headPosition.directionTo(freeField))

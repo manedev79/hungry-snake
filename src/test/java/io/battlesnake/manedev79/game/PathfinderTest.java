@@ -1,5 +1,6 @@
 package io.battlesnake.manedev79.game;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.FieldAccessor_Double;
 import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,5 +31,14 @@ class PathfinderTest {
     void shortestPathAroundObstacle() {
         Board board = Board.of(JsonNodes.fromFile("/pathfinder-test/boardWithObstacle.json"));
         assertEquals(8, pathfinder.findPath(board, new Field(4, 2), new Field(0, 2)).getSteps().size());
+    }
+
+    @Test
+    void pathToOwnTail() {
+        Board board = Board.of(JsonNodes.fromFile("/pathfinder-test/pathToOwnTail.json"));
+        Field start = board.ownSnake.headPosition;
+        Field destination = board.ownSnake.tailPosition;
+
+        assertEquals(asList(new Field( 0, 1), new Field(0, 0)), pathfinder.findPath(board, start, destination).getSteps());
     }
 }

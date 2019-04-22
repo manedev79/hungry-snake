@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 
@@ -23,12 +24,12 @@ public class KillerMood implements SnakeMood {
     }
 
     @Override
-    public Collection<String> provideDirections() {
-        return chaseClosestShorterSnake();
+    public Optional<Collection<String>> provideDirections() {
+        return Optional.ofNullable(chaseClosestShorterSnake());
     }
 
     private Collection<String> chaseClosestShorterSnake() {
-        Field closestShorterSnakeHead = board.otherSnakes.stream()
+        Optional<Field> closestShorterSnakeHead = board.otherSnakes.stream()
                          .filter(otherSnake -> otherSnake.length < board.ownSnake.length)
                          .reduce((snake, snake2) -> {
                              if (board.compareDistanceFromCurrentPosition(snake.headPosition, snake2.headPosition) > 0) {
@@ -36,11 +37,16 @@ public class KillerMood implements SnakeMood {
                              } else {
                                  return snake;
                              }
-                         }).map(snake -> snake.headPosition).orElse(board.middleField());
+                         }).map(snake -> snake.headPosition);
+
+        if (!closestShorterSnakeHead.isPresent()) {
+            LOG.debug("There is no closest shorter snake");
+            return null;
+        }
 
         LOG.debug("Closest shorter snake head is at {}", closestShorterSnakeHead);
 
-        Path path = pathfinder.findPath(board, board.ownSnake.headPosition, closestShorterSnakeHead);
+        Path path = pathfinder.findPath(board, board.ownSnake.headPosition, closestShorterSnakeHead.get());
         Field nextField = path.getSteps().stream().findFirst().orElse(board.middleField());
         return singletonList(board.ownSnake.headPosition.directionTo(nextField));
     }
