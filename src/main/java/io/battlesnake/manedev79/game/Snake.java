@@ -31,9 +31,9 @@ public class Snake {
     }
 
     private LinkedList<Field> getBody(JsonNode jsonBody) {
-        LinkedList<Field> body = new LinkedList<>();
-        jsonBody.forEach(it -> body.add(Field.of(it)));
-        return body;
+        LinkedList<Field> snakeBody = new LinkedList<>();
+        jsonBody.forEach(it -> snakeBody.add(Field.of(it)));
+        return snakeBody;
     }
 
     @Override
