@@ -41,7 +41,7 @@ public class Path {
         return Collections.unmodifiableList(steps);
     }
 
-    int getLength() {
+    public int getLength() {
         return steps.size();
     }
 

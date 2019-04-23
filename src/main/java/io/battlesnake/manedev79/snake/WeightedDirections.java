@@ -21,7 +21,7 @@ public class WeightedDirections {
                                  .orElseThrow(NoWeightedDirectionsException::new);
     }
 
-    public boolean contains(WeightedDirection weightedDirection) {
+    boolean contains(WeightedDirection weightedDirection) {
         return weightedDirections.containsKey(weightedDirection.direction) &&
                 weightedDirections.containsValue(weightedDirection);
     }
@@ -33,6 +33,10 @@ public class WeightedDirections {
     void addWeight(String direction, int additionalWeight) {
         WeightedDirection weightedDirection = new WeightedDirection(direction, additionalWeight);
         weightedDirections.merge(direction, weightedDirection, this::plus);
+    }
+
+    void addWeight(WeightedDirection additionalDirection) {
+        weightedDirections.merge(additionalDirection.direction, additionalDirection, this::plus);
     }
 
     private WeightedDirection plus(WeightedDirection value, WeightedDirection additionalValue) {

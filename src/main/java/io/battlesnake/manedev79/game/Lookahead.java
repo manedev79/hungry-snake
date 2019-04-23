@@ -1,12 +1,15 @@
 package io.battlesnake.manedev79.game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Stack;
 
 import static java.util.stream.Collectors.toList;
 
 public class Lookahead {
-    static final int SEARCH_DEPTH = 10;
+    private static final Logger LOG = LoggerFactory.getLogger(Lookahead.class);
     private Board board;
 
     public Lookahead(Board board) {
@@ -34,6 +37,8 @@ public class Lookahead {
             }
         }
 
-        return path.build();
+        Path freePath = path.build();
+        LOG.debug("Found a free path: {}", freePath);
+        return freePath;
     }
 }

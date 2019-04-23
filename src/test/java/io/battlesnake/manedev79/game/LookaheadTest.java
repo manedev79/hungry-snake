@@ -13,10 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class LookaheadTest {
 
     private Lookahead lookahead;
+    private Board board;
 
     @BeforeEach
     void setUp() {
-        Board board = Board.of(JsonNodes.fromFile("/board-test/emptyBoard.json"));
+        board = Board.of(JsonNodes.fromFile("/board-test/emptyBoard.json"));
         lookahead = new Lookahead(board);
     }
 
@@ -29,6 +30,6 @@ class LookaheadTest {
         });
 
         assertEquals(paths.size(), 4);
-        assertTrue(paths.get(0).getLength() >= Lookahead.SEARCH_DEPTH);
+        assertTrue(paths.get(0).getLength() >= board.ownSnake.length);
     }
 }
