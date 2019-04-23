@@ -23,6 +23,14 @@ public class BattleSnake implements SnakeAI {
     private Collection<String> badDirections = new HashSet<>();
     private Collection<String> dangerousDirections = new HashSet<>();
 
+    // Using weighted approach
+    private static final int FREE_DIRECTION_WEIGHT = 3;
+    private static final int PREFERRED_DIRECTION_WEIGHT = 2;
+    private static final int EASY_KILL_DIRECTION_WEIGHT = 1;
+    private static final int DANGEROUS_DIRECTION_WEIGHT = -2;
+    private static final int FATAL_DIRECTION_WEIGHT = -100;
+    private WeightedDirections weightedDirections = new WeightedDirections();
+
     public BattleSnake(Pathfinder pathfinder) {
         this.snakeMind = new SnakeMind(pathfinder);
         this.pathfinder = pathfinder;
@@ -32,16 +40,21 @@ public class BattleSnake implements SnakeAI {
     public String determineNextMove(final JsonNode moveRequest) {
         board = Board.of(moveRequest);
 
-        preferredDirections.addAll(snakeMind.getPreferredDirections(board));
+        Collection<String> preferredDirections = snakeMind.getPreferredDirections(board);
+        this.preferredDirections.addAll(preferredDirections);
+        preferredDirections.forEach(direction -> weightedDirections.addWeight(direction, PREFERRED_DIRECTION_WEIGHT));
 
         avoidSelf();
         avoidWalls();
         avoidOtherSnakes();
         avoidSnakeHeadCollision();
         avoidDeadEnds();
-//        eatTheWeak(); // TOOD: Re-enable
+        eatTheWeak();
 
         moveSafely();
+
+        LOG.info("Weighted directions: {}", weightedDirections);
+        nextMove = weightedDirections.getHighest().direction;
         return nextMove;
     }
 
@@ -52,6 +65,7 @@ public class BattleSnake implements SnakeAI {
                                                     .map(path -> board.ownSnake.headPosition.directionTo(path.getFirstStep()))
                                                     .collect(Collectors.toSet());
         LOG.debug("Free directions: {}", nonDeadendDirections);
+        nonDeadendDirections.forEach(direction -> weightedDirections.addWeight(direction, FREE_DIRECTION_WEIGHT));
         badDirections.addAll(ALL_DIRECTIONS.stream()
                                            .filter(direction -> !nonDeadendDirections.contains(direction))
                                            .collect(Collectors.toList()));
@@ -66,10 +80,12 @@ public class BattleSnake implements SnakeAI {
     }
 
     private void avoidSnakeBody(List<Field> snakeBody) {
-        badDirections.addAll(snakeBody.stream()
-                                      .filter(it -> board.ownSnake.headPosition.distanceTo(it) == 1)
-                                      .map(it -> board.ownSnake.headPosition.directionTo(it))
-                                      .collect(Collectors.toSet()));
+        Set<String> snakeBodyDirections = snakeBody.stream()
+                                       .filter(it -> board.ownSnake.headPosition.distanceTo(it) == 1)
+                                       .map(it -> board.ownSnake.headPosition.directionTo(it))
+                                       .collect(Collectors.toSet());
+        badDirections.addAll(snakeBodyDirections);
+        snakeBodyDirections.forEach(direction -> weightedDirections.addWeight(direction, FATAL_DIRECTION_WEIGHT));
     }
 
     private void avoidSnakeHeadCollision() {
@@ -79,6 +95,7 @@ public class BattleSnake implements SnakeAI {
                                                                .map(allPossibleDirections())
                                                                .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
         this.dangerousDirections.addAll(dangerousDirections);
+        dangerousDirections.forEach(direction -> weightedDirections.addWeight(direction, DANGEROUS_DIRECTION_WEIGHT));
     }
 
 
@@ -88,6 +105,7 @@ public class BattleSnake implements SnakeAI {
                                                           .filter(smallerSnakes())
                                                           .map(allPossibleDirections())
                                                           .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+        killDirections.forEach(direction -> weightedDirections.addWeight(direction, EASY_KILL_DIRECTION_WEIGHT));
         this.preferredDirections.addAll(killDirections);
     }
 
@@ -108,10 +126,22 @@ public class BattleSnake implements SnakeAI {
     }
 
     private void avoidWalls() {
-        if (board.ownSnake.headPosition.x <= 0) badDirections.add("left");
-        if (board.ownSnake.headPosition.y <= 0) badDirections.add("up");
-        if (board.ownSnake.headPosition.x >= board.maxX) badDirections.add("right");
-        if (board.ownSnake.headPosition.y >= board.maxY) badDirections.add("down");
+        if (board.ownSnake.headPosition.x <= 0) {
+            badDirections.add("left");
+            weightedDirections.addWeight("left", FATAL_DIRECTION_WEIGHT);
+        }
+        if (board.ownSnake.headPosition.y <= 0) {
+            badDirections.add("up");
+            weightedDirections.addWeight("up", FATAL_DIRECTION_WEIGHT);
+        }
+        if (board.ownSnake.headPosition.x >= board.maxX) {
+            badDirections.add("right");
+            weightedDirections.addWeight("right", FATAL_DIRECTION_WEIGHT);
+        }
+        if (board.ownSnake.headPosition.y >= board.maxY) {
+            badDirections.add("down");
+            weightedDirections.addWeight("down", FATAL_DIRECTION_WEIGHT);
+        }
     }
 
     private void avoidOtherSnakes() {
@@ -150,7 +180,7 @@ public class BattleSnake implements SnakeAI {
                                                                              .stream()
                                                                              .findAny()
                                                                              .orElse(DEFAULT_DIRECTION)))));
-        LOG.debug("Next move: {}", nextMove);
+        LOG.info("Next move (old way): {}", nextMove);
     }
 
 }
