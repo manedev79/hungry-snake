@@ -1,6 +1,5 @@
 package io.battlesnake.manedev79.game;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.FieldAccessor_Double;
 import io.battlesnake.manedev79.testutils.JsonNodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

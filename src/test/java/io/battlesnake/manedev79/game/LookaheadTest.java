@@ -17,24 +17,18 @@ class LookaheadTest {
     @BeforeEach
     void setUp() {
         Board board = Board.of(JsonNodes.fromFile("/board-test/emptyBoard.json"));
-        lookahead = new Lookahead(board, new DirectWayPathfinder());
+        lookahead = new Lookahead(board);
     }
 
     @Test
-    void lookaheadContainsSamplePath() {
+    void findFreePathsInTime() {
         List<Path> paths = new ArrayList<>();
 
         assertTimeout(Duration.ofMillis(100), () -> {
             paths.addAll(lookahead.findPathsFrom(Field.of(8, 8)));
         });
 
-        assertTrue(paths.contains(Path.of(
-                Field.of(9, 8),
-                Field.of(9, 9),
-                Field.of(10, 9),
-                Field.of(10, 10),
-                Field.of(11, 10),
-                Field.of(11, 11),
-                Field.of(12, 11))));
+        assertEquals(paths.size(), 4);
+        assertTrue(paths.get(0).getLength() >= Lookahead.SEARCH_DEPTH);
     }
 }

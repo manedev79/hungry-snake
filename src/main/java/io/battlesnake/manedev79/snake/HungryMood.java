@@ -8,8 +8,6 @@ import io.battlesnake.manedev79.game.Pathfinder;
 import java.util.Collection;
 import java.util.Optional;
 
-import static java.util.Collections.singletonList;
-
 public class HungryMood implements SnakeMood {
     private final Pathfinder pathfinder;
     private final Board board;
