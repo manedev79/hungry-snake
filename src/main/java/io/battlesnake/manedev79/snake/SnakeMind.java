@@ -7,7 +7,7 @@ import io.battlesnake.manedev79.game.Snake;
 import java.util.Collection;
 import java.util.Collections;
 
-import static io.battlesnake.manedev79.snake.BattleSnake.HUNGRY_THRESHOLD;
+import static io.battlesnake.manedev79.snake.BattleSnake.Config.HUNGRY_THRESHOLD;
 import static java.lang.Boolean.TRUE;
 
 class SnakeMind {

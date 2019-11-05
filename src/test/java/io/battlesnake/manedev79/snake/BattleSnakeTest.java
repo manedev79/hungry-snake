@@ -156,6 +156,26 @@ class BattleSnakeTest {
         assertEquals("down", snake.nextMove);
     }
 
+    @Test
+    void avoidDeadEnd2() {
+        JsonNode board = givenBoard("/hungry-snake-test/avoidDeadEnd2.json");
+
+        determineMovement(board);
+
+        assertEquals("right", snake.nextMove);
+    }
+
+    @Test
+    void avoidDetours() {
+        JsonNode board = givenBoard("/hungry-snake-test/avoidDetours.json");
+
+        determineMovement(board);
+
+        assertNotEquals("right", snake.nextMove);
+        assertNotEquals("up", snake.nextMove);
+    }
+
+
     private JsonNode givenBoard(String fileName) {
         return JsonNodes.fromFile(fileName);
     }

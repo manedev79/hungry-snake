@@ -5,14 +5,23 @@ import io.battlesnake.manedev79.game.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static io.battlesnake.manedev79.snake.BattleSnake.Config.*;
+
 public class BattleSnake implements SnakeAI {
-    static final int HUNGRY_THRESHOLD = 30; // TODO: Verify value
+
+    class Config {
+        static final int HUNGRY_THRESHOLD = 30; // TODO: Verify value
+        static final int FREE_DIRECTION_WEIGHT = 5;
+        static final int PREFERRED_DIRECTION_WEIGHT = 5;
+        static final int EASY_KILL_DIRECTION_WEIGHT = 7;
+        static final int DANGEROUS_DIRECTION_WEIGHT = -10;
+        static final int FATAL_DIRECTION_WEIGHT = -100;
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(BattleSnake.class);
     private static final String DEFAULT_DIRECTION = "up";
     private final SnakeMind snakeMind;
@@ -20,11 +29,6 @@ public class BattleSnake implements SnakeAI {
     private Board board;
 
     // Using weighted approach
-    private static final int FREE_DIRECTION_WEIGHT = 5;
-    private static final int PREFERRED_DIRECTION_WEIGHT = 5;
-    private static final int EASY_KILL_DIRECTION_WEIGHT = 7;
-    private static final int DANGEROUS_DIRECTION_WEIGHT = -10;
-    private static final int FATAL_DIRECTION_WEIGHT = -1000;
     private WeightedDirections weightedDirections = new WeightedDirections();
 
     public BattleSnake(Pathfinder pathfinder) {
@@ -52,9 +56,23 @@ public class BattleSnake implements SnakeAI {
     private void avoidDeadEnds() {
         Lookahead lookahead = new Lookahead(board);
 
-        lookahead.findPathsFrom(board.ownSnake.headPosition).stream()
-                 .map(path -> new WeightedDirection(board.ownSnake.headPosition.directionTo(path.getFirstStep()), path.getLength() / 10))
-                 .forEach(direction -> weightedDirections.addWeight(direction));
+        List<Path> lookaheadPaths = lookahead.findPathsFrom(board.ownSnake.headPosition);
+        Optional<Path> longestPath = lookaheadPaths.stream().max(Comparator.comparingInt(Path::getLength));
+        if (longestPath.isPresent()) {
+            int maxPathLength = longestPath.get().getLength();
+            lookaheadPaths.stream()
+                          .map(path -> new WeightedDirection(board.ownSnake.headPosition.directionTo(path.getFirstStep()),
+                                  normalizedWeight(path, maxPathLength)))
+                          .forEach(direction -> weightedDirections.addWeight(direction));
+        }
+    }
+
+    private int normalizedWeight(Path path, int maxPathLength) {
+        int normalizedWeight = path.getLength() / maxPathLength * FREE_DIRECTION_WEIGHT;
+        if (path.getLength() < board.ownSnake.length) {
+            normalizedWeight -= 1;
+        }
+        return normalizedWeight;
     }
 
     private void avoidSelf() {
