@@ -75,3 +75,26 @@ or visit [http://APP_NAME.herokuapp.com](http://APP_NAME.herokuapp.com).
 ```
 heroku logs --tail
 ```
+
+Alternative 
+--
+
+Build Docker Image
+---
+
+Build docker image and uplaod to docker.io.
+
+Note: Customize with your dockerhub user!
+
+```
+mvn compile jib:build
+```
+
+Deploy to k8s
+---
+
+    kubectl apply -f k8s/
+
+Verify the snake is up
+
+    curl -kL --request POST localhost/hungry-snake/ping

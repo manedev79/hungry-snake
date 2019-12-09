@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: hungry-snake-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /hungry-snake(/|$)(.*)
+            backend:
+              serviceName: hungry-snake-service
+              servicePort: 8080
+              

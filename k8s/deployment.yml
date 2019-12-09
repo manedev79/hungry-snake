@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hungry-snake-deployment
+  labels:
+    app: hungry-snake
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hungry-snake
+  template:
+    metadata:
+      labels:
+        app: hungry-snake
+    spec:
+      containers:
+        - name: hungry-snake
+          image: manedev79/hungry-snake
+          ports:
+            - containerPort: 8080

@@ -101,6 +101,23 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>1.8.0</version>
+                <configuration>
+                    <to>
+                        <image>docker.io/manedev79/hungry-snake</image>
+                    </to>
+                    <tags>
+                        <tag>${project.version}</tag>
+                        <tag>latest</tag>
+                    </tags>
+                    <ports>
+                        <port>8080</port>
+                    </ports>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
