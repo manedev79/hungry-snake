@@ -108,14 +108,16 @@
                 <configuration>
                     <to>
                         <image>docker.io/manedev79/hungry-snake</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                        </tags>
                     </to>
-                    <tags>
-                        <tag>${project.version}</tag>
-                        <tag>latest</tag>
-                    </tags>
-                    <ports>
-                        <port>8080</port>
-                    </ports>
+                    <container>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                    </container>
                 </configuration>
             </plugin>
         </plugins>
