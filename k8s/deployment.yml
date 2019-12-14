@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: hungry-snake
-          image: manedev79/hungry-snake:1.4
+          image: manedev79/hungry-snake:1.9-beta
           ports:
             - containerPort: 8080
